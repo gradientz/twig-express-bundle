@@ -29,7 +29,7 @@ class StaticController extends Controller {
      * List Assetic bundles
      */
     public function rootAction() {
-        return $this->render('TwigExpressBundle:static:list.html.twig', [
+        return $this->render('TwigExpressBundle::list.html.twig', [
             'bundles' => StaticManager::getStaticBundles($this->container)
         ]);
     }
@@ -147,7 +147,7 @@ class StaticController extends Controller {
             $fileList[] = str_replace('.twig', '', $file->getFilename());
 		}
 
-		return $this->render('TwigExpressBundle:static:index.html.twig', [
+		return $this->render('TwigExpressBundle::index.html.twig', [
 			'crumbs' => $breadcrumbs,
 			'dirList' => $dirList,
 			'fileList' => $fileList
@@ -179,7 +179,7 @@ class StaticController extends Controller {
         }
         $message .= "\n</p>";
 
-		$response = $this->render('TwigExpressBundle:static:notfound.html.twig', [
+		$response = $this->render('TwigExpressBundle::notfound.html.twig', [
 			'crumbs' => $breadcrumbs,
 			'title' => 'File does not exist',
 			'message' => $message
@@ -242,7 +242,7 @@ class StaticController extends Controller {
             $data['codeLang'] = StaticManager::getHighlightLanguage($template);
 		}
 
-        return $this->render('TwigExpressBundle:static:twigerror.html.twig', $data);
+        return $this->render('TwigExpressBundle::twigerror.html.twig', $data);
     }
 
 	/**
@@ -264,7 +264,7 @@ class StaticController extends Controller {
 			'code' => StaticManager::formatCodeBlock($code, true),
             'codeLang' => StaticManager::getHighlightLanguage($localPath)
 		];
-        return $this->render('TwigExpressBundle:static:twigsource.html.twig', $data);
+        return $this->render('TwigExpressBundle::twigsource.html.twig', $data);
 	}
 
 }

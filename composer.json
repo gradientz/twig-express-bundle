@@ -1,6 +1,6 @@
 {
     "name": "gradientz/twig-express-bundle",
-    "description": "Browse and render Twig templates in a Symfony project. This bundle is a port of the TwigExpress tool, and is intended for private front-end prototypes, not public-facing pages.",
+    "description": "Browse and render “static” Twig templates from bundles in a Symfony project. This bundle is a port of the TwigExpress tool, and is intended for private front-end prototypes, not public-facing pages.",
     "license": "MIT",
     "require": {
         "php": ">=5.4.0",

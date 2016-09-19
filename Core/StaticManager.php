@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class StaticManager {
 
     // TODO: replace this path with per-bundle, user-defined configuration
-    const VIEWS_ROOT = 'Resources/views/static-html';
+    const VIEWS_ROOT = 'Resources/views/static';
 
     /**
      * Cleans up a local resource path, removing trailing slashes, double dots, etc.
@@ -50,7 +50,7 @@ class StaticManager {
     }
 
     /**
-     * List Assetic bundles that have a static-html folder
+     * List Assetic bundles that have a 'static' views folder
      * @param  ContainerInterface $container
      * @return array|string
      */
@@ -71,7 +71,7 @@ class StaticManager {
     }
 
     /**
-     * Find a valid static-html bundle matching a case-insensitive string,
+     * Find a bundle with 'static' views, matching a case-insensitive string,
      * and return the bundle's name
      * @param  ContainerInterface $container
      * @param  string $shortName - partial bundle name to match
