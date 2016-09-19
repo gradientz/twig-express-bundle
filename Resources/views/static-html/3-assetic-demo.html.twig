@@ -1,0 +1,34 @@
+{% extends 'TwigExpressBundle:static-html:1-simple-demo.html.twig' %}
+
+{% set metaTitle = 'Loading assets with Assetic' %}
+
+{% block body %}
+    <h1>
+        {{ metaTitle }}
+    </h1>
+
+    <p>
+        This page should be able to load: one image, one stylesheet and 2 scripts.
+    </p>
+
+    {# Loading an image #}
+    {% image '@TwigExpressBundle/Resources/public/demo/baby-sloth.jpg' %}
+    <p>
+        <img src="{{ asset_url }}" alt="[You should see a baby sloth here]">
+    </p>
+    {% endimage %}
+
+    {# Loading stylesheets #}
+    {% stylesheets
+        '@TwigExpressBundle/Resources/public/demo/styles.css' %}
+        <link rel="stylesheet" href="{{ asset_url }}">
+    {% endstylesheets %}
+
+    {# Loading scripts #}
+    {% javascripts
+        '@TwigExpressBundle/Resources/public/demo/script1.js'
+        '@TwigExpressBundle/Resources/public/demo/script2.js' %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+{% endblock %}

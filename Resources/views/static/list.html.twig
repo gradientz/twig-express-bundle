@@ -1,0 +1,38 @@
+{% extends 'TwigExpressBundle::layout.html.twig' %}
+
+{% set metaTitle = 'Static HTML bundles' %}
+{% set showCrumbs = 0 %}
+{% set title %}
+    Bundles with <code>static-html</code> views
+{% endset %}
+
+{% if not bundles %}
+    {% set message = 'Could not find any static HTML bundle.' %}
+{% elseif app.request.get('was') %}
+    {% set message %}
+        Could not find static HTML bundle matching <code>"{{ app.request.get('was') }}"</code>.
+        <br>Showing the list of known static HTML bundles instead.
+    {% endset %}
+{% endif %}
+
+{% block main %}
+    {% if bundles %}
+        <ul class="Links Links--folders">
+        {% for bundle in bundles %}
+            <li>
+                <a href="/static/{{ bundle|lower|replace({'bundle':''}) }}/">
+                    <svg class="icon" aria-hidden="true"><use xlink:href="#icon-folder"/></svg>
+                    {{ bundle }}
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+    <footer>
+        <strong>About:</strong>
+        Static HTML bundles must be referenced in the <code>assetic.bundles</code>
+        config, and must have a <code>Resources/views/static-html</code> folder.
+    </footer>
+
+{% endblock %}

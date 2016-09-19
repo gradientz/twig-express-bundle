@@ -1,0 +1,31 @@
+{% extends 'TwigExpressBundle::layout.html.twig' %}
+
+{% set metaTitle = (crumbs|first).name %}
+{% if crumbs|length > 1 %}
+    {% set metaTitle = (crumbs|last).name ~ ' - ' ~ metaTitle %}
+{% endif %}
+{% set icon = {
+    dir: '<svg class="icon" aria-hidden="true"><use xlink:href="#icon-folder"/></svg>',
+    file: '<svg class="icon" aria-hidden="true"><use xlink:href="#icon-file"/></svg>'
+} %}
+
+{% block main %}
+
+    {% if dirList|length > 0 %}
+        <ul class="Links Links--folders">
+        {% for dir in dirList %}
+            <li><a class="Links-link" href="{{ dir }}/">{{ icon.dir|raw }}{{ dir }}</a></li>
+        {%- endfor %}
+        </ul>
+    {% endif %}
+    {% if fileList|length > 0 %}
+        <ul class="Links Links--files">
+        {% for file in fileList %}
+            <li><a href="{{ file }}">{{ icon.file|raw }}{{
+                file|replace({'.html':'<span>.html</span>'}) | raw
+            }}</a></li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+{% endblock %}

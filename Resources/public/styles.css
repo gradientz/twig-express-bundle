@@ -1,0 +1,462 @@
+/**
+ * Styles from the TwigExpress project:
+ * https://github.com/gradientz/twig-express
+ */
+
+:root {
+    /* spacing */
+    --pad: 2.4rem;
+    --code: Source Code Pro, Menlo, Consolas, Ubuntu Mono, monospace;
+
+    /* HLJS vim-hybrid colors, some modified for HTML+Twig use case */
+    --black: #1d1f21;
+    --white: #fafefc;
+    --lighter-black: #373b41;
+    --dark-gray: #707880;
+    --mid-gray: #8a94a0;
+    --base-gray: #b4b8b6;
+    --lighter-gray: #dce0da;
+    --lightest-gray: #eef2ef;
+    --orange: #de935f;
+    --yellow: #f0c674;
+    --red: #cc6666;
+    --red-darker: #c44e5f;
+    --green: #a5f38f;
+    --dark-green: #6fad77;
+    --purple: #b294bb;
+    --light-purple: #b8c0f0;
+    --blue: #81a2be;
+    --dim-blue: #5b7a95;
+    --aqua: #8abeb7;
+
+    /* vibrant colors */
+    --vibrant-blue: #27c;
+    --vibrant-red: #ff6666;
+    --vibrant-orange: #ffbb16;
+    --vibrant-yellow: #ffea00;
+    --vibrant-green: #44ea3c;
+}
+
+body {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 1rem;
+    padding: var(--pad);
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif;
+    line-height: 1.5;
+    color: var(--lighter-black);
+    background-color: var(--white);
+}
+
+@media (max-width: 600px) {
+    :root {
+        font-size: 87.75%;
+        --pad: 1.2rem;
+    }
+}
+
+@media (min-width: 900px) {
+    :root {
+        padding: 2rem;
+        background-color: var(--lightest-gray);
+    }
+
+    body {
+        max-width: 75rem;
+        margin: 0 auto;
+        border: solid 1px var(--lighter-gray);
+    }
+}
+
+@media (min-width: 1400px) {
+    :root {
+        font-size: 112.5%;
+        --pad: 2.5rem;
+    }
+}
+
+a {
+    color: #07a;
+    color: var(--vibrant-blue);
+}
+
+header {
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    margin-bottom: calc(var(--pad) * .85);
+}
+
+nav {
+    line-height: 1;
+    font-size: 1.125rem;
+    color: var(--mid-gray);
+    cursor: default;
+}
+
+header nav, header h1:first-child {
+    margin-top: calc(var(--pad) * -.15);
+}
+
+header nav:not(:last-child) {
+    margin-bottom: 1em;
+    padding-bottom: 1em;
+    margin-bottom: calc(var(--pad) * .65);
+    padding-bottom: calc(var(--pad) * .65);
+    border-bottom: dashed 1px;
+    border-color: var(--lighter-gray);
+}
+
+nav > * {
+    display: inline-block;
+    margin-right: .1em;
+}
+
+nav .sep {
+    padding: 0 .15em;
+    color: var(--base-gray);
+}
+
+nav .item {
+    padding: 4px 1px;
+    font-weight: 600;
+}
+
+nav span.item {
+    color: var(--mid-gray);
+}
+
+nav a {
+    text-decoration: none;
+}
+
+nav a:hover,
+nav a:focus {
+    text-decoration: underline;
+}
+
+header h1 {
+    margin: .75rem 0 .5rem;
+    font-size: 150%;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--lighter-black);
+}
+
+header blockquote {
+    margin: 0 0 0 .1em;
+    padding-left: .9em;
+    border-left: solid .5em;
+    border-color: var(--vibrant-orange);
+    line-height: 1.5;
+}
+
+header p {
+    margin: 1em 0;
+}
+
+header code {
+    color: var(--dim-blue);
+}
+
+header .error {
+    color: var(--red);
+}
+
+footer {
+    max-width: 38em;
+    margin-top: 1rem;
+    margin-top: var(--pad);
+    color: var(--dark-gray);
+}
+
+/* SVG icons */
+
+.icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: -.15em;
+    fill: currentColor;
+}
+
+/* List of files or folders */
+
+.Links {
+    margin: 1.5em 0 .5em;
+    padding: 0;
+    list-style: none;
+    line-height: 1.3;
+}
+
+@media (min-width: 900px) {
+    .Links--files {
+        -webkit-column-count: 2;
+        -moz-column-count: 2;
+        column-count: 2;
+        -webkit-column-gap: .75em;
+        -moz-column-gap: .75em;
+        column-gap: .75em;
+    }
+    .Links--folders {
+        width: calc(50% - .375em);
+    }
+    .Links--files li {
+        -webkit-column-break-inside: avoid;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+}
+
+.Links li {
+    position: relative;
+}
+.Links li + li {
+    margin-top: -1px;
+}
+.Links .icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    margin-top: -.55em;
+}
+
+.Links a {
+    position: relative;
+    display: block;
+    border: solid 1px var(--lightest-gray);
+    padding: .5rem 1rem .65rem 3rem;
+    text-decoration: none;
+    font-size: 112.5%;
+    color: var(--dim-blue);
+}
+.Links a span {
+    font-size: 85%;
+    margin-left: 2px;
+    opacity: 0;
+}
+.Links a:hover span,
+.Links a:focus span {
+    opacity: .75;
+}
+@media (max-width: 600px) {
+    .Links a {
+        padding-top: .6rem;
+        padding-bottom: .75rem;
+    }
+}
+.Links a:hover,
+.Links a:focus {
+    outline: none;
+    color: #fff;
+    background-color: #555;
+    background-color: var(--dim-blue);
+}
+.Links--folders a {
+    color: var(--red-darker);
+}
+.Links--folders a:hover,
+.Links--folders a:focus {
+    color: #fff;
+    background-color: #222;
+    background-color: var(--red-darker);
+}
+
+
+/* Code block */
+
+pre, code {
+    font-family: monospace, monospace;
+    font-family: var(--code);
+}
+
+code {
+    font-size: 93.75%;
+}
+
+pre code {
+    display: block;
+}
+
+pre mark {
+    color: white;
+    background: black;
+}
+
+.Code {
+    position: relative;
+    margin: -1rem;
+    margin: calc(var(--pad) * -1);
+    margin-top: 1rem;
+    padding: 1rem;
+    padding: calc(var(--pad) * .66) var(--pad);
+    line-height: 1.5;
+    color: var(--base-gray);
+    background: var(--black);
+}
+
+.Code > pre {
+    overflow: hidden;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: inherit;
+}
+
+.Code--mark code > :not(mark),
+.Code--mark mark > :not([class*="hljs-template-"]) {
+    filter: saturate(0%);
+}
+
+/* Line numbers */
+
+.Code--numbers > pre {
+    padding-left: 3ch;
+}
+
+.Code [data-num] {
+    display: none;
+}
+
+.Code--numbers [data-num] {
+    position: absolute;
+    z-index: 9;
+    display: inline-block;
+    width: 3ch;
+    overflow: hidden;
+    margin-left: -5ch;
+    text-align: right;
+    color: var(--dark-gray);
+}
+.Code--numbers [data-num]::before {
+    content: attr(data-num);
+}
+
+/**
+ * vim-hybrid theme by w0ng (https://github.com/w0ng/vim-hybrid)
+ * Ported to CSS variables for fun.
+ * With modifications or additions in the case of Twig templates
+ * (in order to make the templating tags more visible, and other
+ * markup, especially HTML, more subdued).
+ */
+
+.hljs {
+    display: block;
+}
+
+.hljs::selection,
+.hljs ::selection {
+    background: var(--lighter-black);
+}
+
+.hljs::-moz-selection,
+.hljs ::-moz-selection {
+    background: var(--lighter-black);
+}
+
+.hljs-emphasis {
+    font-style: italic;
+}
+
+.hljs-strong {
+    font-weight: bold;
+}
+
+.hljs-subst {
+    color: var(--base-gray);
+}
+
+.hljs-title,
+.hljs-name,
+.hljs-attr {
+    color: var(--purple);
+}
+
+.hljs-comment,
+.hljs-meta,
+.hljs-meta .hljs-keyword {
+    color: var(--dark-gray);
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-literal,
+.hljs-deletion,
+.hljs-link {
+    color: var(--red);
+}
+
+.hljs-doctag,
+.hljs-addition,
+.hljs-regexp,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+    color: var(--green);
+}
+
+.hljs-attribute,
+.hljs-code,
+.hljs-selector-id {
+    color: var(--purple);
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-bullet,
+.hljs-tag {
+    color: var(--blue);
+}
+
+.hljs-string,
+.hljs-variable {
+    color: var(--aqua);
+}
+
+.hljs-type,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-quote,
+.hljs-section,
+.hljs-selector-class {
+    color: var(--orange);
+}
+
+/* Special modifications for HTML tags (subtler look) */
+
+.hljs-tag {
+    color: var(--dim-blue);
+}
+
+.hljs-tag .hljs-name {
+    color: var(--blue);
+}
+
+.hljs-tag .hljs-attr {
+    color: var(--purple);
+}
+
+.hljs-tag .hljs-string {
+    color: var(--mid-gray);
+}
+
+/* Special modifications for Twig tags and vars (vibrant look) */
+
+
+.hljs-template-comment {
+    color: var(--light-purple);
+}
+
+.hljs-template-tag {
+    color: var(--vibrant-orange);
+}
+
+.hljs-template-tag .hljs-name,
+.hljs-template-tag .hljs-keyword {
+    color: var(--vibrant-yellow);
+}
+
+.hljs-template-variable {
+    color: var(--green);
+}
+
+.hljs-template-variable .hljs-name {
+    color: var(--vibrant-green);
+}

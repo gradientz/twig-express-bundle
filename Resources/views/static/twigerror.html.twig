@@ -1,0 +1,14 @@
+{% extends 'TwigExpressBundle::layout.html.twig' %}
+
+{% set metaTitle = title %}
+{% set isError = true %}
+
+{% block main %}
+    {% if code|default('') %}
+        <div class="Code Code--mark {% if ' data-num=' in code %}Code--numbers{% endif %}">
+            <pre><code>
+            {{- code|raw -}}
+            </code></pre>
+        </div>
+    {% endif %}
+{% endblock %}

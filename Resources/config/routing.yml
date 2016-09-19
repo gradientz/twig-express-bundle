@@ -1,0 +1,12 @@
+twig_express_root:
+    path: "/static/"
+    defaults:
+        _controller: TwigExpressBundle:Static:root
+
+twig_express_find:
+    path: "/static/{bundle}{path}"
+    defaults:
+        _controller: TwigExpressBundle:Static:find
+    requirements:
+        bundle: "[A-Za-z0-9_]+"
+        path: "(\\/?[\\/\\.A-Za-z0-9_-]+)?"

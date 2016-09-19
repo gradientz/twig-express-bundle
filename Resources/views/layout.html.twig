@@ -1,0 +1,82 @@
+{% spaceless %}
+
+    {# Content #}
+    {% set title = title|default('') %}
+    {% set message = message|default('') %}
+    {% set code = code|default('') %}
+
+    {# Breadcrumbs #}
+    {% set showCrumbs = showCrumbs|default(1) %}
+    {% set crumbs = crumbs|default([]) %}
+    {# By default we're on the last item #}
+    {% set activeCrumb = activeCrumb|default(crumbs|length) %}
+
+{% endspaceless %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex">
+    <meta name="viewport" content="width=device-width">
+    {% if metaTitle|default(0) %}
+    <title>{{ metaTitle }}</title>
+    {% endif %}
+    <style>
+        {{- source('@TwigExpressBundle/Resources/public/styles.css')|raw -}}
+    </style>
+</head>
+<body>
+
+{{ source('@TwigExpressBundle/Resources/public/sprite.svg')|raw }}
+
+<header>
+{% if showCrumbs %}
+    {% set lastItem = crumbs|last %}
+    <nav class="border">
+        {% for item in crumbs %}
+            {%- spaceless %}
+                {% if not loop.first and item.name != '.twig' %}
+                    <span class="sep">/</span>
+                {% endif %}
+                {% if loop.index != activeCrumb %}
+                    <a class="item" href="{{ item.url }}">{{ item.name }}</a>
+                {% else %}
+                    <span class="item">{{ item.name }}</span>
+                {% endif %}
+            {% endspaceless -%}
+        {% endfor %}
+    </nav>
+{% endif %}
+{% if title %}
+    <h1>{{ title|raw }}</h1>
+{% endif %}
+{% if message %}
+    <blockquote>{{ message|raw }}</blockquote>
+{% endif %}
+</header>
+
+<main>
+{% block main %}
+    {% if code %}
+        <div class="Code{%- if ' data-num=' in code %} Code--numbers{% endif %}">
+            <pre><code>
+            {{- code|raw -}}
+            </code></pre>
+        </div>
+    {% endif %}
+{% endblock %}
+</main>
+
+{% if code %}
+<script>
+{% if codeLang|default('') %}
+window.twigSubLanguage = '{{ codeLang }}';
+{% endif %}
+{{ source('@TwigExpressBundle/Resources/assets/highlight.min.js')
+   |replace({'</script': '<\\/script'})
+   |raw }};hljs.initHighlighting();
+</script>
+{% endif %}
+
+</body>
+</html>

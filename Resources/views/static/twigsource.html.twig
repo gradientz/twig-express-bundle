@@ -1,0 +1,6 @@
+{% extends 'TwigExpressBundle::layout.html.twig' %}
+
+{% set metaTitle = (crumbs|first).name %}
+{% if crumbs|length > 1 %}
+    {% set metaTitle = (crumbs|last).name ~ ' - ' ~ metaTitle %}
+{% endif %}
