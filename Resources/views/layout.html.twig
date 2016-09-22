@@ -22,12 +22,12 @@
     <title>{{ metaTitle }}</title>
     {% endif %}
     <style>
-        {{- source('@TwigExpressBundle/Resources/public/styles.css')|raw -}}
+        {{- source('@GradientzTwigExpressBundle/Resources/public/styles.css')|raw -}}
     </style>
 </head>
 <body>
 
-{{ source('@TwigExpressBundle/Resources/public/sprite.svg')|raw }}
+{{ source('@GradientzTwigExpressBundle/Resources/public/sprite.svg')|raw }}
 
 <header>
 {% if showCrumbs %}
@@ -72,7 +72,7 @@
 {% if codeLang|default('') %}
 window.twigSubLanguage = '{{ codeLang }}';
 {% endif %}
-{{ source('@TwigExpressBundle/Resources/assets/highlight.min.js')
+{{ source('@GradientzTwigExpressBundle/Resources/assets/highlight.min.js')
    |replace({'</script': '<\\/script'})
    |raw }};hljs.initHighlighting();
 </script>

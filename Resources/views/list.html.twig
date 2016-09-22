@@ -1,4 +1,4 @@
-{% extends 'TwigExpressBundle::layout.html.twig' %}
+{% extends '@GradientzTwigExpress/layout.html.twig' %}
 
 {% set metaTitle = 'Static HTML bundles' %}
 {% set showCrumbs = 0 %}
@@ -20,7 +20,7 @@
         <ul class="Links Links--folders">
         {% for bundle in bundles %}
             <li>
-                <a href="/static/{{ bundle|lower|replace({'bundle':''}) }}/">
+                <a href="{{ bundle|lower|replace({'bundle':''}) }}/">
                     <svg class="icon" aria-hidden="true"><use xlink:href="#icon-folder"/></svg>
                     {{ bundle }}
                 </a>

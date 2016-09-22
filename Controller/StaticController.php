@@ -29,7 +29,7 @@ class StaticController extends Controller {
      * List Assetic bundles
      */
     public function rootAction() {
-        return $this->render('TwigExpressBundle::list.html.twig', [
+        return $this->render('GradientzTwigExpressBundle::list.html.twig', [
             'bundles' => StaticManager::getStaticBundles($this->container)
         ]);
     }
@@ -46,7 +46,7 @@ class StaticController extends Controller {
         $ext = pathinfo($cleanPath, PATHINFO_EXTENSION);
 
         // Base URL for redirects and breadcrumbs
-        $baseUrl = $this->generateUrl('twig_express_find', [
+        $baseUrl = $this->generateUrl('gradientz_twig_express_find', [
             'bundle' => $cleanRef,
             'path' => '/'
         ]);
@@ -61,7 +61,7 @@ class StaticController extends Controller {
         $bundleName = StaticManager::findStaticBundle($this->container, $cleanRef);
         // No bundle found -> redirect to list of bundles
         if (!$bundleName) {
-			$url = $this->generateUrl('twig_express_root') . '?was=' . $cleanRef;
+			$url = $this->generateUrl('gradientz_twig_express_root') . '?was=' . $cleanRef;
 			return $this->redirect($url);
 		}
 
@@ -147,7 +147,7 @@ class StaticController extends Controller {
             $fileList[] = str_replace('.twig', '', $file->getFilename());
 		}
 
-		return $this->render('TwigExpressBundle::index.html.twig', [
+		return $this->render('GradientzTwigExpressBundle::index.html.twig', [
 			'crumbs' => $breadcrumbs,
 			'dirList' => $dirList,
 			'fileList' => $fileList
@@ -179,7 +179,7 @@ class StaticController extends Controller {
         }
         $message .= "\n</p>";
 
-		$response = $this->render('TwigExpressBundle::notfound.html.twig', [
+		$response = $this->render('GradientzTwigExpressBundle::notfound.html.twig', [
 			'crumbs' => $breadcrumbs,
 			'title' => 'File does not exist',
 			'message' => $message
@@ -242,7 +242,7 @@ class StaticController extends Controller {
             $data['codeLang'] = StaticManager::getHighlightLanguage($template);
 		}
 
-        return $this->render('TwigExpressBundle::twigerror.html.twig', $data);
+        return $this->render('GradientzTwigExpressBundle::twigerror.html.twig', $data);
     }
 
 	/**
@@ -264,7 +264,7 @@ class StaticController extends Controller {
 			'code' => StaticManager::formatCodeBlock($code, true),
             'codeLang' => StaticManager::getHighlightLanguage($localPath)
 		];
-        return $this->render('TwigExpressBundle::twigsource.html.twig', $data);
+        return $this->render('GradientzTwigExpressBundle::twigsource.html.twig', $data);
 	}
 
 }

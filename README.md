@@ -1,4 +1,4 @@
-# TwigExpressBundle
+# GradientzTwigExpressBundle
 
 Browse and render “static” Twig templates in a Symfony project. This bundle is a port of the [TwigExpress](https://github.com/gradientz/twig-express) tool, and is intended for private front-end prototypes. You might like it if you’re a designer or front-end developer working with Symfony.
 
@@ -37,7 +37,7 @@ Add `gradientz/twig-express-bundle` to your dependencies:
 
 ```
 twig_express:
-    resource: "@TwigExpressBundle/Resources/config/routing.yml"
+    resource: "@GradientzTwigExpressBundle/Resources/config/routing.yml"
 ```
 
 (3) Make sure your bundle(s) with `static` views are listed in Assetic's configuration:
@@ -56,7 +56,7 @@ This bundle contains its own demo `static` templates. To activate the demo, add 
 
 ```
 imports:
-    - { resource: "@TwigExpressBundle/Resources/config/demo.yml" }
+    - { resource: "@GradientzTwigExpressBundle/Resources/config/demo.yml" }
 ```
 
 (It’s a simple config file that adds this bundle to `assetic.bundles`, and declares a Twig global variable. Feel free to imitate this pattern to create static bundle-specific config that is easy to plug in.)

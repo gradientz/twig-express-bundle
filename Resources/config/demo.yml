@@ -1,14 +1,10 @@
-#twig_express:
-#    twig_express:
-
+# Enable bundle for Assetic and GradientzTwigExpressBundle use
+assetic:
+    bundles: [ GradientzTwigExpressBundle ]
 
 # (Optional) Add to Twig global variables, using a namespace to avoid collisions
 # (especially if you have more than one bundle with 'static' views).
 twig:
     globals:
-        twig_express:
+        gradientz_twig_express:
             test: 'It works.'
-
-# (Optional) Enable bundle for Assetic and TwigExpressBundle use
-assetic:
-    bundles: [ TwigExpressBundle ]
