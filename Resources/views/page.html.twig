@@ -18,7 +18,7 @@
     <meta charset="UTF-8">
     <meta name="robots" content="noindex">
     <meta name="viewport" content="width=device-width">
-    {% if metaTitle|default(0) %}
+    {% if metaTitle|default('') %}
     <title>{{ metaTitle }}</title>
     {% endif %}
     <style>
@@ -58,11 +58,9 @@
 <main>
 {% block main %}
     {% if code %}
-        <div class="Code{%- if ' data-num=' in code %} Code--numbers{% endif %}">
-            <pre><code>
+        <pre class="Code{%- if ' data-num=' in code %} Code--numbers{% endif %}"><code class="twig">
             {{- code|raw -}}
-            </code></pre>
-        </div>
+        </code></pre>
     {% endif %}
 {% endblock %}
 </main>

@@ -2,7 +2,7 @@
 
 namespace Gradientz\TwigExpressBundle\Controller;
 
-use Gradientz\TwigExpressBundle\Core\StaticManager;
+use Gradientz\TwigExpressBundle\Core\Utils;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,10 +18,12 @@ class StaticController extends Controller {
     protected $baseUrl;
     /** @var null|string Valid bundle name, e.g. 'SomeCoolBundle' */
     protected $bundleName;
-    /** @var null|string Resource root, e.g. '@SomeCoolBundle/Resources/views/static' */
-    protected $resourceRoot;
-    /** @var null|string System path to resource root */
-    protected $resourceRootPath;
+    /** @var null|string System path to bundle root */
+    protected $bundlePath;
+    /** @var null|string Document root, e.g. '@SomeCoolBundle/Resources/views/static' */
+    protected $docRootName;
+    /** @var null|string System path to document root */
+    protected $docRootPath;
     /** @var null|string The name of an existing template we're trying to show */
     protected $templateName;
 
@@ -29,8 +31,8 @@ class StaticController extends Controller {
      * List Assetic bundles
      */
     public function rootAction() {
-        return $this->render('GradientzTwigExpressBundle::list.html.twig', [
-            'bundles' => StaticManager::getStaticBundles($this->container)
+        return $this->render('@GradientzTwigExpress/root.html.twig', [
+            'bundles' => Utils::getStaticBundles($this->container)
         ]);
     }
 
@@ -41,103 +43,83 @@ class StaticController extends Controller {
 	 * @return RedirectResponse|Response
 	 */
     public function findAction($bundle, $path) {
-		$cleanPath = StaticManager::getCleanPath($path);
+		$cleanPath = Utils::getCleanPath($path);
 		$cleanRef = preg_replace('/(_|bundle$)/', '', strtolower($bundle));
-        $ext = pathinfo($cleanPath, PATHINFO_EXTENSION);
+        $pathExt = pathinfo($cleanPath, PATHINFO_EXTENSION);
+        $showSource = $pathExt === 'twig';
 
-        // Base URL for redirects and breadcrumbs
-        $baseUrl = $this->generateUrl('gradientz_twig_express_find', [
+        // Base URL for redirects and breadcrumbs (no trailing slash)
+        $this->baseUrl = $this->generateUrl('gradientz_twig_express_find', [
             'bundle' => $cleanRef,
-            'path' => '/'
+            'path' => ''
         ]);
 
         // Redirect if we can clean up the URL
-		if ($cleanRef !== $bundle || $cleanPath !== trim($path, '/')) {
-            $trailing = !$ext && substr($path, -1) === '/';
-            $url = $baseUrl . $cleanPath . ($trailing ? '/' : '');
-            return $this->redirect($url);
+		if ($cleanRef !== $bundle || $cleanPath !== $path) {
+            return $this->redirect($this->baseUrl . $cleanPath);
 		}
 
-        $bundleName = StaticManager::findStaticBundle($this->container, $cleanRef);
-        // No bundle found -> redirect to list of bundles
-        if (!$bundleName) {
-			$url = $this->generateUrl('gradientz_twig_express_root') . '?was=' . $cleanRef;
-			return $this->redirect($url);
+		// Figure out bundle name and path
+        $this->bundleName = Utils::findStaticBundle($this->container, $cleanRef);
+        if (!$this->bundleName) {
+			$rootUrl = $this->generateUrl('gradientz_twig_express_root');
+			return $this->redirect($rootUrl . '?was=' . $cleanRef);
 		}
+        $this->bundlePath = rtrim($this->container->get('kernel')->locateResource('@'.$this->bundleName), '/');
 
-		// Identify target file or directory
-		$resourceRoot = '@'.$bundleName.'/'.StaticManager::VIEWS_ROOT;
-		$rootPath = $this->container->get('kernel')->locateResource($resourceRoot);
+		// Where is our "document root"?
+        $docRoot = trim(Utils::VIEWS_ROOT, '/');
+        $this->docRootName = '@'.$this->bundleName . '/' . $docRoot;
+        $this->docRootPath = $this->bundlePath . '/' . $docRoot;
+        $basePath = $this->docRootPath . rtrim($cleanPath, '/');
 
-        $isDir = !$ext && is_dir("$rootPath/$cleanPath");
-        // Redirect folder URL if missing the trailing slash
-        if ($isDir && substr($path, -1) !== '/') {
-            return $this->redirect($baseUrl . $cleanPath . '/');
-        }
-
-		// Is there a file we can render?
-        $lookupPaths = [];
-        $templateName = null;
-        $templatePath = null;
-        if ($ext === 'twig') {
-            if (file_exists("$rootPath/$cleanPath")) {
-                $templateName = "$resourceRoot/$cleanPath";
-                $templatePath = "$rootPath/$path";
+        // First look for a directory
+        if (!$pathExt && is_dir($basePath)) {
+            // Redirect folder URL if missing the trailing slash
+            if (substr($cleanPath, -1) !== '/') {
+                return $this->redirect($this->baseUrl . $cleanPath . '/');
             }
-        } else {
-            if ($isDir) {
-                $lookupPaths[] = "$cleanPath/index.twig";
-                $lookupPaths[] = "$cleanPath/index.html.twig";
+            $template = null;
+            if (file_exists($basePath . '/index.html.twig')) {
+                return $this->renderTwig($this->docRootName . $cleanPath . 'index.html.twig');
+            } elseif (file_exists($basePath . '/index.twig')) {
+                return $this->renderTwig($this->docRootName . $cleanPath . 'index.twig');
             } else {
-                $lookupPaths[] = "$cleanPath.twig";
-                if ($ext === '') $lookupPaths[] = "$cleanPath.html.twig";
-            }
-            foreach ($lookupPaths as $path) {
-                if (file_exists("$rootPath/$path")) {
-                    $templateName = "$resourceRoot/$path";
-                    $templatePath = "$rootPath/$path";
-                    break;
-                }
+                return $this->renderDir($basePath, $cleanPath);
             }
         }
-
-        // Update class vars
-        $this->baseUrl = $baseUrl;
-        $this->bundleName = $bundleName;
-        $this->resourceRoot = $resourceRoot;
-        $this->resourceRootPath = $rootPath;
-        $this->templateName = $templateName;
-
-        if ($templatePath && $ext === 'twig') {
-            return $this->showTwigSource($templatePath, $cleanPath);
+        // Then look for a file
+        elseif (file_exists($basePath . ($showSource ? '' : '.twig'))) {
+            // Redirect without slash if needed
+            if (substr($path, -1) === '/') {
+                return $this->redirect($this->baseUrl . substr($cleanPath, 0, -1));
+            } elseif ($showSource) {
+                return $this->showSource($basePath, $cleanPath);
+            } else {
+                return $this->renderTwig($this->docRootName . $cleanPath . '.twig');
+            }
         }
-        // Also render index templates if they exist
-		if ($templateName) {
-		    return $this->renderTwig($templateName);
-		}
-		if ($isDir) {
-		    return $this->renderDir($rootPath, $cleanPath);
-		}
-        return $this->render404($cleanPath, $lookupPaths);
-	}
+        // Finish with 404 if nothing matched
+        return $this->render404($cleanPath);
+    }
 
 	/**
 	 * Show a directory listing page
-	 * @param string $rootPath
-     * @param string $localPath
+	 * @param string $dirPath Directory system path
+     * @param string $urlFragment URL without base or bundle key
 	 * @return Response
 	 */
-	private function renderDir($rootPath, $localPath) {
+	private function renderDir($dirPath, $urlFragment) {
         // Prepare breadcrumbs
-        $breadcrumbs = StaticManager::makeBreadcrumbs(
+        $breadcrumbs = Utils::makeBreadcrumbs(
             $this->baseUrl,
             $this->bundleName,
-            $localPath
+            $urlFragment
         );
 
 		// Prepare content list
 		$finder = new Finder();
-		$iterator = $finder->depth(0)->in("$rootPath/$localPath")->sortByName();
+		$iterator = $finder->depth(0)->in($dirPath)->sortByName();
 		$dirList = [];
 		$fileList = [];
 		foreach ($iterator->directories() as $dir) {
@@ -147,7 +129,7 @@ class StaticController extends Controller {
             $fileList[] = str_replace('.twig', '', $file->getFilename());
 		}
 
-		return $this->render('GradientzTwigExpressBundle::index.html.twig', [
+		return $this->render('@GradientzTwigExpress/dir.html.twig', [
 			'crumbs' => $breadcrumbs,
 			'dirList' => $dirList,
 			'fileList' => $fileList
@@ -156,31 +138,30 @@ class StaticController extends Controller {
 
 	/**
 	 * Show a File Not Found page
-     * @param string $path
-     * @param array  $lookupPaths
+     * @param string $urlFragment URL without base or bundle key
 	 * @return Response
 	 */
-	private function render404($path, $lookupPaths) {
+	private function render404($urlFragment) {
 	    // Prepare breadcrumbs
-        $breadcrumbs = StaticManager::makeBreadcrumbs(
+        $breadcrumbs = Utils::makeBreadcrumbs(
             $this->baseUrl,
             $this->bundleName,
-            $path
+            $urlFragment
         );
 
 		// Prepare message
-        $root = $this->resourceRoot;
-		$message = '<p>Could not find : <code class="error">'.$path.'</code><br>';
-		$message .= "\nIn : <code>$root</code></p>\n";
-        $message .= "<p>We looked for:";
-        array_unshift($lookupPaths, $path . '/');
-        foreach ($lookupPaths as $path) {
-            $message .= "<br>\n<code>$root/$path</code>";
+        $root = $this->docRootName;
+        if (substr($urlFragment, -5) === '.twig' || substr($urlFragment, -1) === '/') {
+            $miss = $urlFragment;
+        } else {
+            $miss = $urlFragment . '.twig';
         }
-        $message .= "\n</p>";
+		$message = '<p>Could not find : <code class="error">'.$miss.'</code><br>';
+		$message .= "\nIn : <code>$root</code></p>";
 
-		$response = $this->render('GradientzTwigExpressBundle::notfound.html.twig', [
+		$response = $this->render('@GradientzTwigExpress/page.html.twig', [
 			'crumbs' => $breadcrumbs,
+            'metaTitle' => 'Not found: ' . $urlFragment,
 			'title' => 'File does not exist',
 			'message' => $message
 		]);
@@ -196,75 +177,102 @@ class StaticController extends Controller {
 	private function renderTwig($templateName) {
 	    // Do we have an extension, like .html or .json?
 		$ext = pathinfo(substr($templateName, 0, -5), PATHINFO_EXTENSION);
-        $cType = $ext ? StaticManager::getMediaType($ext) . ';charset=utf-8' : null;
+        $cType = $ext ? Utils::getMediaType($ext) . ';charset=utf-8' : null;
 		try {
 			$response = $this->render($templateName);
 			if ($cType) $response->headers->set('Content-Type', $cType);
 			return $response;
 		}
 		catch (Twig_Error $error) {
-			return $this->showTwigError($error);
+			return $this->showTwigError($error, $templateName);
 		}
 	}
 
 	/**
 	 * Show an error page for a Twig_Error, with the faulty Twig code if we can.
 	 * @param Twig_Error $error
+     * @param string $templateName Path of rendered template (error may be in a different template)
 	 * @return Response
 	 */
-	private function showTwigError(Twig_Error $error) {
-	    // Might be different from $this->templateName, if the error
-        // occurred in an included file.
-		$template = $error->getTemplateFile();
+	private function showTwigError(Twig_Error $error, $templateName) {
         $line = $error->getTemplateLine();
         $message = $error->getRawMessage();
-        $localPath = str_replace($this->resourceRoot, '', $template);
-        $systemPath = $this->resourceRootPath . '/' . $localPath;
+
+	    // Might be different from $templateName, if the error occurred in an
+        // included file. Also we can get one of three types of result:
+        // - A full system path
+        // - @SomeBundleNameBundle/some/path/xyz
+        // - @SomeBundleName/xyz (= @SomeBundleNameBundle/Resources/views/xyz)
+        // We're going to have to do a bit of guessing.
+		$fileRef  = $error->getTemplateFile();
+        $filePath = $fileRef; // ultimately, we want a full system path
+        $fileName = $fileRef; // we want a @SomeBundleNameBundle/xyz type of name
+
+        // Key used by Symfony/Twig to reference views inside Resources/views,
+        // Format is '@MyBunleName' without the final 'Bundle'.
+        $bundlePrefix = '@' . $this->bundleName;
+        $bundleViewsPrefix = '@' . substr($this->bundleName, 0, -6);
+
+        // @SomeBundleNameBundle (bundle root)
+        if (strpos($fileRef, $bundlePrefix.'/') === 0) {
+            $filePath = str_replace($bundlePrefix, $this->bundlePath, $fileRef);
+        }
+        // @SomeBundleName (bundle root + Resources/views)
+        elseif (strpos($fileRef, $bundleViewsPrefix.'/') === 0) {
+            $filePath = str_replace($bundleViewsPrefix, $this->bundlePath.'/Resources/views', $fileRef);
+            $fileName = str_replace($bundleViewsPrefix, $bundlePrefix.'/Resources/views', $fileRef);
+        }
+        // Full system path
+        elseif (strpos($fileRef, $this->bundlePath) === 0) {
+            $fileName = '@'.$this->bundleName . str_replace($this->bundlePath, '', $fileRef);
+        }
 
         // Prepare breadcrumbs
-        $breadcrumbs = StaticManager::makeBreadcrumbs(
+        $breadcrumbs = Utils::makeBreadcrumbs(
             $this->baseUrl,
             $this->bundleName,
-            $localPath
+            str_replace($this->docRootName, '', $templateName)
         );
 
 		$data = [
+		    'metaTitle' => 'Error: ' . basename($fileName),
+			'title' => get_class($error),
 			'crumbs' => $breadcrumbs,
             'activeCrumb' => count($breadcrumbs) - 1,
-			'title' => get_class($error),
-			'message' => "$message<br>\nOn line $line of $template"
+			'message' => "$message<br>\nLine $line of <code>$fileName</code>"
 		];
 
         // Get a few lines of code from the buggy template
-		if (file_exists($systemPath)) {
-            $code = file_get_contents($systemPath);
-            $data['code'] = StaticManager::formatCodeBlock($code, true, $line, 5);
-            $data['codeLang'] = StaticManager::getHighlightLanguage($template);
+		if (file_exists($filePath)) {
+            $code = file_get_contents($filePath);
+            $data['code'] = Utils::formatCodeBlock($code, true, $line, 5);
+            $data['codeLang'] = Utils::getHighlightLanguage($fileRef);
 		}
 
-        return $this->render('GradientzTwigExpressBundle::twigerror.html.twig', $data);
+        return $this->render('@GradientzTwigExpress/page.html.twig', $data);
     }
 
 	/**
 	 * Show a Twig file with syntax highlighting
 	 * @param string $systemPath Full path to file
-     * @param string $localPath Full path to file
+     * @param string $urlFragment URL without base or bundle key
      * @return Response
 	 */
-	private function showTwigSource($systemPath, $localPath) {
+	private function showSource($systemPath, $urlFragment) {
         // Prepare breadcrumbs
-        $breadcrumbs = StaticManager::makeBreadcrumbs(
+        $breadcrumbs = Utils::makeBreadcrumbs(
             $this->baseUrl,
             $this->bundleName,
-            $localPath
+            $urlFragment
         );
         $code = file_get_contents($systemPath);
 		$data = [
+		    'metaTitle' => 'Source: ' . basename($systemPath),
 		    'crumbs' => $breadcrumbs,
-			'code' => StaticManager::formatCodeBlock($code, true),
-            'codeLang' => StaticManager::getHighlightLanguage($localPath)
+			'code' => Utils::formatCodeBlock($code, true),
+            'codeLang' => Utils::getHighlightLanguage($systemPath)
 		];
-        return $this->render('GradientzTwigExpressBundle::twigsource.html.twig', $data);
+        return $this->render('@GradientzTwigExpress/page.html.twig', $data);
 	}
 
 }

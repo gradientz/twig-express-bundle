@@ -6,22 +6,21 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 
-class StaticManager {
+class Utils {
 
     // TODO: replace this path with per-bundle, user-defined configuration
     const VIEWS_ROOT = 'Resources/views/static';
 
     /**
-     * Cleans up a local resource path, removing trailing slashes, double dots, etc.
+     * Cleans up a local resource path, removing back-slashes, double dots, etc.
      * Should not be necessary for content from a URL but let's be on the safe side.
      * @param  string $path
      * @return string
      */
     static function getCleanPath($path) {
-        // Normalize path (only '/', no trailing slashes, no '..')
         return preg_replace(
-            ['/\/{2,}/', '/\.{2,}/', '/(^\/|\/$)/'],
-            ['/', '.', ''],
+            ['/\\\/', '/\/{2,}/', '/\.{2,}/'],
+            ['/', '/', '.'],
             $path
         );
     }
@@ -90,13 +89,13 @@ class StaticManager {
     /**
      * Make an associative array with URL=>Name values
      * representing the breadcrumbs for a given base URL and path
-     * @param  string $baseUrl
+     * @param  string $baseUrl (no trailing slash)
      * @param  string $bundleName
      * @param  string $path
      * @return array
      */
     static function makeBreadcrumbs($baseUrl, $bundleName, $path) {
-        $url = $baseUrl;
+        $url = $baseUrl . '/';
         $crumbs = [['url' => $url, 'name' => $bundleName]];
         $fragments = array_filter(explode('/', $path));
         $last = array_pop($fragments);

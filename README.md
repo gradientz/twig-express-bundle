@@ -1,8 +1,6 @@
 # GradientzTwigExpressBundle
 
-Browse and render “static” Twig templates in a Symfony project. This bundle is a port of the [TwigExpress](https://github.com/gradientz/twig-express) tool, and is intended for private front-end prototypes. You might like it if you’re a designer or front-end developer working with Symfony.
-
-**Warning:** do not use this bundle or its routes in production (`prod` environment)!
+Browse and render “static” Twig templates in a Symfony project. This bundle is a port of the [TwigExpress](https://github.com/gradientz/twig-express) tool, and is intended for private front-end prototypes. You might like it if you’re a designer or front-end developer working with Symfony. *Do not use this bundle or its routes in production!*
 
 ## Features
 
