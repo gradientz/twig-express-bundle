@@ -4,11 +4,11 @@
     "type": "symfony-bundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.4.0",
-        "symfony/symfony": ">=2.4.0"
+        "php": ">=5.4",
+        "symfony/symfony": ">=2.4",
+        "twig/twig": ">=1.15"
     },
     "autoload": {
         "psr-4": { "Gradientz\\TwigExpressBundle\\": "" }
-    },
-    "minimum-stability": "dev"
+    }
 }
