@@ -1,18 +1,18 @@
 body::after,
 .test {
-	display: block;
-	margin: 1em 0;
-	padding: 2em 1em;
-	text-align: center;
-	color: white;
-	background: black;
+    display: block;
+    margin: 1em 0;
+    padding: 2em 1em;
+    text-align: center;
+    color: white;
+    background: black;
 }
 
 body::after {
-	content: "Stylesheet 1/1 is loaded";
-	background: blue;
+    content: "Stylesheet 1/1 is loaded";
+    background: blue;
 }
 
 .test {
-	background: green;
+    background: green;
 }
