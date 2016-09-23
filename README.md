@@ -4,59 +4,65 @@ Browse and render “static” Twig templates in a Symfony project. This bundle 
 
 ## Features
 
-1.  Gives access to a bundle’s `Resources/views/static` folder.
-2.  Shows index pages for this folder and subfolders.
-3.  Renders Twig templates, and reports Twig errors with an extract of the faulty template.
+1.  Gives access to the Twig templates in the `Resources/views/static` folder of a bundle, showing index pages for this folder and subfolders. (Note that the root folder can be changed for each bundle.)
+2.  Renders Twig templates, and reports Twig errors with an extract of the faulty template.
 
-Note that this bundle’s routes will *not* be able to render templates that depend on data provided by existing controllers. It’s intended for “static” prototypes which don’t depend on any data from databases or services.
+**Important:** this bundle’s controller will *not* be able to render templates that depend on data provided by other existing controllers. It’s intended for “static” prototypes which don’t depend on any data from databases or services.
 
 ## Installation
 
-*This part assumes that you have some basic knowledge about [Composer](https://getcomposer.org/) and `composer.json` config.*
+Install with [Composer](https://getcomposer.org/) in your Symfony project:
 
-Add `gradientz/twig-express-bundle` to your dependencies:
-
-```json
-{
-	"repositories": [
-        { "type": "vcs", "url": "https://github.com/gradientz/twig-express-bundle" }
-    ],
-    "require": {
-        "gradientz/twig-express-bundle": "~1.0"
-    }
-}
+```
+composer require gradientz/twig-express-bundle
 ```
 
 ## Getting started
 
-(1) Put your “static” templates in the `Resources/views/static` folder of your bundle(s).
+Add this to your routes (for example in `routing_dev.yml`):
 
-(2) Add this to your routes (for example in `routing_dev.yml`):
-
-```
+```yaml
 twig_express:
     resource: "@GradientzTwigExpressBundle/Resources/config/routing.yml"
 ```
 
-(3) Make sure your bundle(s) with `static` views are listed in Assetic's configuration:
+Then configure `twig_express.bundles` (for example in `config_dev.yml`) with a list of bundles whose “static” templates you want to explore:
 
+```yaml
+twig_express:
+    bundles: [ MyStaticBundle, AwesomeStaticBundle ]
 ```
-assetic:
-    bundles:
-        - AcmeDefaultBundle
-        - MyStaticBundle
-        - AwesomeStaticBundle
-```
+
+Finally, navigate to `http://[your-hostname]/static/` to see a list your bundles which have `static` views.
 
 ## Demo pages
 
-This bundle contains its own demo `static` templates. To activate the demo, add this import to your config:
+This bundle contains its own demo `static` templates. To activate the demo, add this import to your `config_dev.yml`:
 
-```
+```yaml
 imports:
     - { resource: "@GradientzTwigExpressBundle/Resources/config/demo.yml" }
 ```
 
-(It’s a simple config file that adds this bundle to `assetic.bundles`, and declares a Twig global variable. Feel free to imitate this pattern to create static bundle-specific config that is easy to plug in.)
+## Advanced configuration
 
-Then navigate to `http://hostname/static/` to see a list your bundles which have `static` views.
+For each bundle, instead of providing the bundle’s name only, you can change the URL slug (the part that identifies this bundle in the URL) and the path to the bundle’s “static” templates:
+
+```yaml
+twig_express:
+    bundles:
+        # Name is required and must be a valid bundle;
+        # root and slug will use fallback values if not defined.
+        -   name: MyStaticBundle
+            root: Resources/views/static-html
+            slug: ohmy
+        -   name: AwesomeStaticBundle
+            slug: awesome
+```
+
+If you would like to use a different base URL than “static”, use the `twig_express.base_url` parameter:
+
+```
+parameters:
+    twig_express.base_url: something-different
+```
