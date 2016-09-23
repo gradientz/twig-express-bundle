@@ -57,12 +57,13 @@ twig_express:
             root: Resources/views/static-html
             slug: ohmy
         -   name: AwesomeStaticBundle
+            root: Resources/components
             slug: awesome
 ```
 
 If you would like to use a different base URL than “static”, use the `twig_express.base_url` parameter:
 
-```
+```yaml
 parameters:
     twig_express.base_url: something-different
 ```
