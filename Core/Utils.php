@@ -8,9 +8,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Utils {
 
-    // TODO: replace this path with per-bundle, user-defined configuration
-    const VIEWS_ROOT = 'Resources/views/static';
-
     /**
      * Cleans up a local resource path, removing back-slashes, double dots, etc.
      * Should not be necessary for content from a URL but let's be on the safe side.
@@ -46,44 +43,6 @@ class Utils {
             $type = $knownTypes[$ext];
         }
         return $type;
-    }
-
-    /**
-     * List Assetic bundles that have a 'static' views folder
-     * @param  ContainerInterface $container
-     * @return array|string
-     */
-    static function getStaticBundles($container) {
-        $matched = [];
-        $fs = new Filesystem();
-        $htmlPath = self::VIEWS_ROOT;
-        $bundles = $container->getParameter('assetic.bundles');
-
-        foreach ($bundles as $name) {
-            $bundlePath = $container->get('kernel')->locateResource('@' . $name);
-            if ($fs->exists($bundlePath . $htmlPath)) {
-                $matched[] = $name;
-            }
-        }
-
-        return $matched;
-    }
-
-    /**
-     * Find a bundle with 'static' views, matching a case-insensitive string,
-     * and return the bundle's name
-     * @param  ContainerInterface $container
-     * @param  string $shortName - partial bundle name to match
-     * @return string|null
-     */
-    static function findStaticBundle($container, $shortName) {
-        $bundles = self::getStaticBundles($container);
-        foreach ($bundles as $name) {
-            if (strtolower($shortName) . 'bundle' === strtolower($name)) {
-                return $name;
-            }
-        }
-        return null;
     }
 
     /**

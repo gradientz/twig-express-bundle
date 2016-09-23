@@ -1,12 +1,12 @@
 gradientz_twig_express_root:
-    path: "/static/"
+    path: "/%twig_express.base_url%/"
     defaults:
         _controller: GradientzTwigExpressBundle:Static:root
 
 gradientz_twig_express_find:
-    path: "/static/{bundle}{path}"
+    path: "/%twig_express.base_url%/{slug}{path}"
     defaults:
         _controller: GradientzTwigExpressBundle:Static:find
     requirements:
-        bundle: "[A-Za-z0-9_]+"
+        slug: "[A-Za-z0-9_-]+"
         path: "(\\/?[\\/\\.A-Za-z0-9_-]+)?"

@@ -32,43 +32,50 @@ class StaticController extends Controller {
      */
     public function rootAction() {
         return $this->render('@GradientzTwigExpress/root.html.twig', [
-            'bundles' => Utils::getStaticBundles($this->container)
+            'bundles' => $this->getParameter('twig_express.bundles')
         ]);
     }
 
-	/**
-	 * Find a template to render or a folder whose content to list
-	 * @param  string  $bundle
-	 * @param  string  $path
-	 * @return RedirectResponse|Response
-	 */
-    public function findAction($bundle, $path) {
+    /**
+     * Find a template to render or a folder whose content to list
+     * @param  string $slug Slug identifying a bundle
+     * @param  string $path Path to a resource (starting with '/')
+     * @return RedirectResponse|Response
+     * @throws \Exception
+     */
+    public function findAction($slug, $path) {
 		$cleanPath = Utils::getCleanPath($path);
-		$cleanRef = preg_replace('/(_|bundle$)/', '', strtolower($bundle));
         $pathExt = pathinfo($cleanPath, PATHINFO_EXTENSION);
         $showSource = $pathExt === 'twig';
 
         // Base URL for redirects and breadcrumbs (no trailing slash)
         $this->baseUrl = $this->generateUrl('gradientz_twig_express_find', [
-            'bundle' => $cleanRef,
+            'slug' => $slug,
             'path' => ''
         ]);
 
         // Redirect if we can clean up the URL
-		if ($cleanRef !== $bundle || $cleanPath !== $path) {
+		if ($cleanPath !== $path) {
             return $this->redirect($this->baseUrl . $cleanPath);
 		}
 
-		// Figure out bundle name and path
-        $this->bundleName = Utils::findStaticBundle($this->container, $cleanRef);
-        if (!$this->bundleName) {
+		// Figure out bundle name
+        $bundleConfig = $this->getParameter('twig_express.bundles');
+        if (!array_key_exists($slug, $bundleConfig)) {
 			$rootUrl = $this->generateUrl('gradientz_twig_express_root');
-			return $this->redirect($rootUrl . '?was=' . $cleanRef);
+			return $this->redirect($rootUrl . '?was=' . $slug);
 		}
-        $this->bundlePath = rtrim($this->container->get('kernel')->locateResource('@'.$this->bundleName), '/');
+        $this->bundleName = $bundleConfig[$slug]['name'];
+
+		// Check that it's a valid bundle
+        $allBundles = array_keys($this->get('kernel')->getBundles());
+		if (!in_array($this->bundleName, $allBundles)) {
+		    throw new \Exception('Unknown bundle "'.$this->bundleName.'". Make sur this bundle is installed and your "twig_express.bundles" config is correct.');
+        }
 
 		// Where is our "document root"?
-        $docRoot = trim(Utils::VIEWS_ROOT, '/');
+        $docRoot = $bundleConfig[$slug]['root'];
+        $this->bundlePath = rtrim($this->container->get('kernel')->locateResource('@'.$this->bundleName), '/');
         $this->docRootName = '@'.$this->bundleName . '/' . $docRoot;
         $this->docRootPath = $this->bundlePath . '/' . $docRoot;
         $basePath = $this->docRootPath . rtrim($cleanPath, '/');

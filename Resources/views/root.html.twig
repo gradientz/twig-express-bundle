@@ -18,11 +18,11 @@
 {% block main %}
     {% if bundles %}
         <ul class="Links Links--folders">
-        {% for bundle in bundles %}
+        {% for slug,bundle in bundles %}
             <li>
-                <a href="{{ bundle|lower|replace({'bundle':''}) }}/">
+                <a href="{{ slug }}/">
                     <svg class="icon" aria-hidden="true"><use xlink:href="#icon-folder"/></svg>
-                    {{ bundle }}
+                    {{ bundle.name }}
                 </a>
             </li>
         {% endfor %}
@@ -30,9 +30,16 @@
     {% endif %}
 
     <footer>
-        <strong>About:</strong>
-        Static HTML bundles must be referenced in the <code>assetic.bundles</code>
-        config, and must have a <code>Resources/views/static</code> folder.
+        <h2>About:</h2>
+        <p>To add to this list of bundles, add to the <code>twig_express.bundles</code> config key:</p>
+        <pre>twig_express:
+    bundles: [ AcmeSuperNiceBundle ]</pre>
+        <p>You can also give more explicit config, including the URL slug to use and the path to the views you want to give access to:</p>
+        <pre>twig_express:
+    bundles:
+        -   name: AcmeSuperNiceBundle
+            slug: super-nice
+            root: Resources/views/custom-dir</pre>
     </footer>
 
 {% endblock %}

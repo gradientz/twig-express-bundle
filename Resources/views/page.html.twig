@@ -58,7 +58,10 @@
 <main>
 {% block main %}
     {% if code %}
-        <pre class="Code{%- if ' data-num=' in code %} Code--numbers{% endif %}"><code class="twig">
+        <pre class="Code
+            {%- if ' data-num=' in code %} Code--numbers{% endif -%}
+            {%- if '<mark>' in code %} Code--mark{% endif -%}
+        "><code class="twig">
             {{- code|raw -}}
         </code></pre>
     {% endif %}

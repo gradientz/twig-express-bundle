@@ -1,10 +1,13 @@
-# Enable bundle for Assetic and GradientzTwigExpressBundle use
-assetic:
-    bundles: [ GradientzTwigExpressBundle ]
+# REQUIRED: enable this bundle to be used with GradientzTwigExpressBundle
+twig_express:
+    bundles:
+        -   name: GradientzTwigExpressBundle
+            slug: twig-express-demo
+            root: Resources/views/demo
 
 # (Optional) Add to Twig global variables, using a namespace to avoid collisions
 # (especially if you have more than one bundle with 'static' views).
 twig:
     globals:
-        gradientz_twig_express:
+        twig_express_demo:
             test: 'It works.'
