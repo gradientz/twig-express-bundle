@@ -5,16 +5,16 @@ namespace Gradientz\TwigExpressBundle\Core;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-
-class Utils {
-
+class Utils
+{
     /**
      * Cleans up a local resource path, removing back-slashes, double dots, etc.
      * Should not be necessary for content from a URL but let's be on the safe side.
      * @param  string $path
      * @return string
      */
-    static function getCleanPath($path) {
+    static function getCleanPath($path)
+    {
         return preg_replace(
             ['/\\\/', '/\/{2,}/', '/\.{2,}/'],
             ['/', '/', '.'],
@@ -28,7 +28,8 @@ class Utils {
      * @param  string $ext - lowercase file extension
      * @return string  The corresponding media type
      */
-    static function getMediaType($ext) {
+    static function getMediaType($ext)
+    {
         $type = 'text/plain';
         $knownTypes = [
             'htm' => 'text/html',
@@ -53,13 +54,14 @@ class Utils {
      * @param  string $path
      * @return array
      */
-    static function makeBreadcrumbs($baseUrl, $bundleName, $path) {
+    static function makeBreadcrumbs($baseUrl, $bundleName, $path)
+    {
         $url = $baseUrl . '/';
         $crumbs = [['url' => $url, 'name' => $bundleName]];
         $fragments = array_filter(explode('/', $path));
         $last = array_pop($fragments);
 
-        foreach($fragments as $fragment) {
+        foreach ($fragments as $fragment) {
             $url .= $fragment . '/';
             $crumbs[] = ['url' => $url, 'name' => $fragment];
         }
@@ -87,7 +89,8 @@ class Utils {
      * @param int $extract Number of lines to show before and after an highlighted line
      * @return string
      */
-    static function formatCodeBlock($code, $numbers=true, $highlight=0, $extract=4) {
+    static function formatCodeBlock($code, $numbers=true, $highlight=0, $extract=4)
+    {
         $escaped = htmlspecialchars($code, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $lines = preg_split("/(\r\n|\n)/", $escaped);
         // Use 1-indexes
@@ -122,7 +125,8 @@ class Utils {
      * @param string $filename
      * @return string
      */
-    static function getHighlightLanguage($filename) {
+    static function getHighlightLanguage($filename)
+    {
         // Try to figure out the subLanguage
         $subLang   = 'xml';
         $subLangs  = [
@@ -142,5 +146,4 @@ class Utils {
         }
         return $subLang;
     }
-
 }

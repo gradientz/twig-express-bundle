@@ -9,9 +9,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Twig_Error;
 
-
-class StaticController extends Controller {
-
+class StaticController extends Controller
+{
     // The excution flow can go e.g.: findAction -> renderTwig -> showTwigError,
     // and we'd like to keep some information around.
     /** @var bool The kernel.debug parameter */
@@ -32,7 +31,8 @@ class StaticController extends Controller {
     /**
      * List Assetic bundles
      */
-    public function rootAction() {
+    public function rootAction()
+    {
         return $this->render('@GradientzTwigExpress/root.html.twig', [
             'bundles' => $this->getParameter('twig_express.bundles')
         ]);
@@ -45,7 +45,8 @@ class StaticController extends Controller {
      * @return RedirectResponse|Response
      * @throws \Exception
      */
-    public function findAction($slug, $path) {
+    public function findAction($slug, $path)
+    {
         $this->debug = $this->getParameter('kernel.debug');
         $cleanPath = Utils::getCleanPath($path);
         $pathExt = pathinfo($cleanPath, PATHINFO_EXTENSION);
@@ -124,7 +125,8 @@ class StaticController extends Controller {
      * @param string $urlFragment URL without base or bundle key
      * @return Response
      */
-    private function renderDir($dirPath, $urlFragment) {
+    private function renderDir($dirPath, $urlFragment)
+    {
         // Prepare breadcrumbs
         $breadcrumbs = Utils::makeBreadcrumbs(
             $this->baseUrl,
@@ -156,7 +158,8 @@ class StaticController extends Controller {
      * @param string $urlFragment URL without base or bundle key
      * @return Response
      */
-    private function render404($urlFragment) {
+    private function render404($urlFragment)
+    {
         // Prepare breadcrumbs
         $breadcrumbs = Utils::makeBreadcrumbs(
             $this->baseUrl,
@@ -190,7 +193,8 @@ class StaticController extends Controller {
      * @return Response
      * @throws Twig_Error
      */
-    private function renderTwig($templateName) {
+    private function renderTwig($templateName)
+    {
         // Do we have an extension, like .html or .json?
         $ext = pathinfo(substr($templateName, 0, -5), PATHINFO_EXTENSION);
         $cType = $ext ? Utils::getMediaType($ext) . ';charset=utf-8' : null;
@@ -214,7 +218,8 @@ class StaticController extends Controller {
      * @param string $templateName Path of rendered template (error may be in a different template)
      * @return Response
      */
-    private function showTwigError(Twig_Error $error, $templateName) {
+    private function showTwigError(Twig_Error $error, $templateName)
+    {
         $line = $error->getTemplateLine();
         $message = $error->getRawMessage();
 
@@ -278,7 +283,8 @@ class StaticController extends Controller {
      * @param string $urlFragment URL without base or bundle key
      * @return Response
      */
-    private function showSource($systemPath, $urlFragment) {
+    private function showSource($systemPath, $urlFragment)
+    {
         // Prepare breadcrumbs
         $breadcrumbs = Utils::makeBreadcrumbs(
             $this->baseUrl,
@@ -294,5 +300,4 @@ class StaticController extends Controller {
         ];
         return $this->render('@GradientzTwigExpress/page.html.twig', $data);
     }
-
 }

@@ -5,14 +5,15 @@ namespace Gradientz\TwigExpressBundle\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
-
-class GradientzTwigExpressExtension extends Extension {
-
-    public function getAlias() {
+class GradientzTwigExpressExtension extends Extension
+{
+    public function getAlias()
+    {
         return 'twig_express';
     }
 
-    public function load(array $configs, ContainerBuilder $container) {
+    public function load(array $configs, ContainerBuilder $container)
+    {
         $config = $this->processConfiguration(new Configuration(), $configs);
 
         // Make sure we have a base_url parameter so we can use it in routes
@@ -23,7 +24,7 @@ class GradientzTwigExpressExtension extends Extension {
         // Expose configured bundle information
         // (Is there a better way to get access to our config from controllers???)
         $bundles = [];
-        foreach($config['bundles'] as $item) {
+        foreach ($config['bundles'] as $item) {
             $name = $item['name'];
             $slug = $item['slug'];
             // Create slug if necessary, and clean it up
@@ -39,5 +40,4 @@ class GradientzTwigExpressExtension extends Extension {
         }
         $container->setParameter('twig_express.bundles', $bundles);
     }
-
 }
