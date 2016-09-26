@@ -19,7 +19,7 @@
         </ul>
     {% endif %}
     {% if fileList|length > 0 %}
-        <ul class="Links Links--files">
+        <ul class="Links Links--files{% if fileList|length > 3 %} Links--cols{% endif %}">
         {% for file in fileList %}
             <li><a href="{{ file }}">{{ icon.file|raw }}{{
                 file|replace({'.html':'<span>.html</span>'}) | raw
