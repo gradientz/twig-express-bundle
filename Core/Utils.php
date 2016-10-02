@@ -2,9 +2,6 @@
 
 namespace Gradientz\TwigExpressBundle\Core;
 
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 class Utils
 {
     /**
