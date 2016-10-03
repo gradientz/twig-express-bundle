@@ -4,12 +4,22 @@
     {% set title = title|default('') %}
     {% set message = message|default('') %}
     {% set code = code|default('') %}
+    {% set assets = '@GradientzTwigExpressBundle/Resources/public/' %}
 
     {# Breadcrumbs #}
-    {% set showCrumbs = showCrumbs|default(1) %}
     {% set crumbs = crumbs|default([]) %}
     {# By default we're on the last item #}
     {% set activeCrumb = activeCrumb|default(crumbs|length) %}
+
+    {# File listing #}
+    {% set dirList = dirList|default([]) %}
+    {% set fileList = fileList|default([]) %}
+
+    {# Other #}
+    {% set icon = {
+        dir: '<svg class="icon" aria-label="Folder"><use xlink:href="#icon-folder"/></svg>',
+        file: '<svg class="icon" aria-label="File"><use xlink:href="#icon-file"/></svg>'
+    } %}
 
 {% endspaceless %}
 <!DOCTYPE html>
@@ -19,19 +29,18 @@
     <meta name="robots" content="noindex">
     <meta name="viewport" content="width=device-width">
     {% if metaTitle|default('') %}
-    <title>{{ metaTitle }}</title>
+        <title>{{ metaTitle }}</title>
     {% endif %}
     <style>
-        {{- source('@GradientzTwigExpressBundle/Resources/public/css/styles.css')|raw -}}
+        {{- source(assets~'css/styles.css')|raw -}}
     </style>
 </head>
 <body>
 
-{{ source('@GradientzTwigExpressBundle/Resources/public/svg/sprite.svg')|raw }}
+{{ source(assets~'svg/sprite.svg')|raw }}
 
 <header>
-{% if showCrumbs %}
-    {% set lastItem = crumbs|last %}
+    {% if crumbs|length > 0 %}
     <nav class="border">
         {% for item in crumbs %}
             {%- spaceless %}
@@ -46,37 +55,52 @@
             {% endspaceless -%}
         {% endfor %}
     </nav>
-{% endif %}
-{% if title %}
-    <h1>{{ title|raw }}</h1>
-{% endif %}
-{% if message %}
-    <blockquote>{{ message|raw }}</blockquote>
-{% endif %}
+    {% endif %}
+    {% if title %}
+        <h1>{{ title|raw }}</h1>
+    {% endif %}
+    {% if message %}
+        <blockquote>{{ message|raw }}</blockquote>
+    {% endif %}
 </header>
 
-<main>
-{% block main %}
-    {% if code %}
+<main>{% block main %}
+    {%- if dirList|length > 0 %}
+        <ul class="Links Links--folders">
+            {% for dir in dirList -%}
+                <li><a class="Links-link" href="{{ dir }}/">{{ icon.dir|raw }}{{ dir }}</a></li>
+            {%- endfor %}
+        </ul>
+    {%- endif %}
+    {%- if fileList|length > 0 %}
+        <ul class="Links Links--files{% if fileList|length > 3 %} Links--cols{% endif %}">
+            {% for file in fileList -%}
+                <li><a href="{{ file }}">{{ icon.file|raw }}{{
+                    file|replace({'.html':'<span>.html</span>'}) | raw
+                }}</a></li>
+            {%- endfor %}
+        </ul>
+    {%- endif %}
+    {%- if code %}
         <pre class="Code
-            {%- if ' data-num=' in code %} Code--numbers{% endif -%}
-            {%- if '<mark>' in code %} Code--mark{% endif -%}
-        "><code class="twig">
-            {{- code|raw -}}
-        </code></pre>
-    {% endif %}
-{% endblock %}
-</main>
+        {%- if ' data-num=' in code %} Code--numbers{% endif -%}
+        {%- if '<mark>' in code %} Code--mark{% endif -%}
+    "><code class="twig">
+        {{- code|raw -}}
+    </code></pre>
+    {%- endif %}
+{% endblock %}</main>
+
+{% block footer %}{% endblock %}
 
 {% if code %}
-<script>
-{% if codeLang|default('') %}
-window.twigSubLanguage = '{{ codeLang }}';
-{% endif %}
-{{ source('@GradientzTwigExpressBundle/Resources/public/js/highlight.min.js')
-   |replace({'</script': '<\\/script'})
-   |raw }};hljs.initHighlighting();
-</script>
+    <script>
+        {% if codeLang|default('') %}
+        window.twigSubLanguage = '{{ codeLang }}';
+        {% endif %}
+        {{ source(assets~'js/highlight.min.js')|replace({'</script': '<\\/script'})|raw }}
+        ;hljs.initHighlighting();
+    </script>
 {% endif %}
 
 </body>

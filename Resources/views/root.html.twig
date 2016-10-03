@@ -16,19 +16,21 @@
 {% endif %}
 
 {% block main %}
-    {% if bundles %}
+    {%- if bundles -%}
         <ul class="Links Links--folders">
         {% for slug,bundle in bundles %}
             <li>
                 <a href="{{ slug }}/">
-                    <svg class="icon" aria-hidden="true"><use xlink:href="#icon-folder"/></svg>
+                    <svg class="icon"><use xlink:href="#icon-folder"/></svg>
                     {{ bundle.name }}
                 </a>
             </li>
         {% endfor %}
         </ul>
-    {% endif %}
+    {%- endif -%}
+{% endblock %}
 
+{% block footer %}
     <footer>
         <h2>About:</h2>
         <p>To add to this list of bundles, add to the <code>twig_express.bundles</code> config key:</p>
@@ -41,5 +43,4 @@
             slug: super-nice
             root: Resources/views/custom-dir</pre>
     </footer>
-
 {% endblock %}
