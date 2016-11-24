@@ -32,12 +32,12 @@
         <title>{{ metaTitle }}</title>
     {% endif %}
     <style>
-        {{- source(assets~'css/styles.css')|raw -}}
+        {{- source(assets~'styles.css')|raw -}}
     </style>
 </head>
 <body>
 
-{{ source(assets~'svg/sprite.svg')|raw }}
+{{ source(assets~'sprite.svg')|raw }}
 
 <header>
     {% if crumbs|length > 0 %}
@@ -98,7 +98,7 @@
         {% if codeLang|default('') %}
         window.twigSubLanguage = '{{ codeLang }}';
         {% endif %}
-        {{ source(assets~'js/highlight.min.js')|replace({'</script': '<\\/script'})|raw }}
+        {{ source(assets~'highlight.js')|replace({'</script': '<\\/script'})|raw }}
         ;hljs.initHighlighting();
     </script>
 {% endif %}
