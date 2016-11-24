@@ -1,10 +1,10 @@
 gradientz_twig_express_root:
-    path: "/%twig_express.base_url%/"
+    path: "/%twig_express.url_base%/"
     defaults:
         _controller: GradientzTwigExpressBundle:Static:root
 
 gradientz_twig_express_find:
-    path: "/%twig_express.base_url%/{slug}{path}"
+    path: "/%twig_express.url_base%/{slug}{path}"
     defaults:
         _controller: GradientzTwigExpressBundle:Static:find
     requirements:

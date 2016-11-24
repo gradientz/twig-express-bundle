@@ -61,9 +61,9 @@ twig_express:
             slug: awesome
 ```
 
-If you would like to use a different base URL than “static”, use the `twig_express.base_url` parameter:
+If you would like to use a different URL base than `/static/…`, use the `twig_express.url_base` parameter:
 
 ```yaml
 parameters:
-    twig_express.base_url: something-different
+    twig_express.url_base: something-different
 ```

@@ -14,16 +14,15 @@ class GradientzTwigExpressExtension extends Extension
 
     public function load(array $configs, ContainerBuilder $container)
     {
-        $config = $this->processConfiguration(new Configuration(), $configs);
-
-        // Make sure we have a base_url parameter so we can use it in routes
-        $baseUrl = $container->getParameter('twig_express.base_url');
-        if (is_string($baseUrl)) $baseUrl = trim($baseUrl, '/');
-        if (!$baseUrl) $container->setParameter('twig_express.base_url', 'static');
+        // Make sure we have a twig_express.url_base parameter so we can use it in routes
+        if ($container->hasParameter('twig_express.url_base') === false) {
+            $container->setParameter('twig_express.url_base', 'static');
+        }
 
         // Expose configured bundle information
         // (Is there a better way to get access to our config from controllers???)
         $bundles = [];
+        $config = $this->processConfiguration(new Configuration(), $configs);
         foreach ($config['bundles'] as $item) {
             $name = $item['name'];
             $slug = $item['slug'];
