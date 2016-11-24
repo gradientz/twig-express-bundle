@@ -34,7 +34,7 @@ class StaticController extends Controller
     public function rootAction()
     {
         return $this->render('@GradientzTwigExpress/root.html.twig', [
-            'bundles' => $this->getParameter('twig_express.bundles')
+            'bundles' => $this->container->getParameter('twig_express.bundles')
         ]);
     }
 
@@ -47,7 +47,7 @@ class StaticController extends Controller
      */
     public function findAction($slug, $path)
     {
-        $this->debug = $this->getParameter('kernel.debug');
+        $this->debug = $this->container->getParameter('kernel.debug');
         $cleanPath = Utils::getCleanPath($path);
         $pathExt = pathinfo($cleanPath, PATHINFO_EXTENSION);
         $showSource = $pathExt === 'twig';
@@ -69,7 +69,7 @@ class StaticController extends Controller
         }
 
         // Figure out bundle name
-        $bundleConfig = $this->getParameter('twig_express.bundles');
+        $bundleConfig = $this->container->getParameter('twig_express.bundles');
         if (!array_key_exists($slug, $bundleConfig)) {
             $rootUrl = $this->generateUrl('gradientz_twig_express_root');
             return $this->redirect($rootUrl . '?was=' . $slug);
