@@ -1,0 +1,36 @@
+# Changelog for TwigExpressBundle
+
+## 3.0.0-pre
+
+- Rebrand GradientzTwigExpressBundle as KaliopTwigExpressBundle
+  (same as our sister project: https://github.com/kaliop/twig-express)
+
+## 2.0.4
+
+- Cleanup front-end assets. (A few changes so that GitHub and Packagist
+  identify this project as mostly PHP-based. ¯\_(ツ)_/¯)
+
+## 2.0.3
+
+- Fix compatibility with Symfony 2.5 and 2.6
+- Bump minimum requirement to Symfony 2.5
+  (from 2.4 in composer.json, which was wrong).
+
+## 2.0.2
+
+- CSS updates
+
+## 2.0.1
+
+- CSS tweaks
+- Put all assets in Resources/public
+
+## 2.0.0
+
+- Partial rewrite.
+- Removes dependency on Assetic config.
+- Bug fixes.
+
+## 1.0.0
+
+- First public release, based on the standalone twigexpress.phar.

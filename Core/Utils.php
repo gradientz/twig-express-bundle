@@ -1,6 +1,6 @@
 <?php
 
-namespace Gradientz\TwigExpressBundle\Core;
+namespace Kaliop\TwigExpressBundle\Core;
 
 class Utils
 {

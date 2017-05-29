@@ -1,33 +1,33 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>{{ metaTitle|default('GradientzTwigExpressBundle demo page') }}</title>
-    <style>
-        body { font-family: sans-serif; max-width: 30em; margin: 0 auto; padding: 2em; line-height: 1.25; }
-        pre { margin: 1em 0; padding: 1em; background: #ddd; }
-        p, li { line-height: 1.5; }
-    </style>
+  <meta charset="utf-8">
+  <title>{{ metaTitle|default('KaliopTwigExpressBundle demo page') }}</title>
+  <style>
+    body { font-family: sans-serif; max-width: 30em; margin: 0 auto; padding: 2em; line-height: 1.25; }
+    pre { margin: 1em 0; padding: 1em; background: #ddd; }
+    p, li { line-height: 1.5; }
+  </style>
 </head>
 <body>
-    {% block body %}
-        <h1>
-            Hello!
-        </h1>
-        <p>
-            If you can render this page without getting an error,
-            then the GradientzTwigExpressBundle is working alright.
-        </p>
-        <hr>
-        <p>
-            This bundle has its own config file (<code>Resources/config/demo.yml</code>)
-            for adding itself to the <code>assetic.bundles</code> list.
-        </p>
-        <p>
-            This config file can also be used to declare global Twig variables. For instance,
-            this is the <code>twig_express_demo.test</code> variable:<br>
-        </p>
-        <pre>{{ twig_express_demo.test }}</pre>
-    {% endblock %}
+  {% block body %}
+    <h1>
+      Hello!
+    </h1>
+    <p>
+      If you can render this page without getting an error,
+      then KaliopTwigExpressBundle is working alright.
+    </p>
+    <hr>
+    <p>
+      This bundle has its own config file (<code>Resources/config/demo.yml</code>)
+      for adding itself to the <code>assetic.bundles</code> list.
+    </p>
+    <p>
+      This config file can also be used to declare global Twig variables. For instance,
+      this is the <code>twig_express_demo.test</code> variable:<br>
+    </p>
+    <pre>{{ twig_express_demo.test }}</pre>
+  {% endblock %}
 </body>
 </html>

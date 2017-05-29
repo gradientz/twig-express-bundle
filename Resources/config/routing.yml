@@ -1,12 +1,12 @@
-gradientz_twig_express_root:
+kaliop_twig_express_root:
     path: "/%twig_express.url_base%/"
     defaults:
-        _controller: GradientzTwigExpressBundle:Static:root
+        _controller: KaliopTwigExpressBundle:Static:root
 
-gradientz_twig_express_find:
+kaliop_twig_express_find:
     path: "/%twig_express.url_base%/{slug}{path}"
     defaults:
-        _controller: GradientzTwigExpressBundle:Static:find
+        _controller: KaliopTwigExpressBundle:Static:find
     requirements:
         slug: "[A-Za-z0-9_-]+"
         path: "(\\/?[\\/\\.A-Za-z0-9_-]+)?"

@@ -1,8 +1,8 @@
 <?php
 
-namespace Gradientz\TwigExpressBundle\Controller;
+namespace Kaliop\TwigExpressBundle\Controller;
 
-use Gradientz\TwigExpressBundle\Core\Utils;
+use Kaliop\TwigExpressBundle\Core\Utils;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,7 +33,7 @@ class StaticController extends Controller
      */
     public function rootAction()
     {
-        return $this->render('@GradientzTwigExpress/root.html.twig', [
+        return $this->render('@KaliopTwigExpress/root.html.twig', [
             'bundles' => $this->container->getParameter('twig_express.bundles')
         ]);
     }
@@ -53,7 +53,7 @@ class StaticController extends Controller
         $showSource = $pathExt === 'twig';
 
         // Base URL for redirects and breadcrumbs (no trailing slash)
-        $this->baseUrl = $this->generateUrl('gradientz_twig_express_find', [
+        $this->baseUrl = $this->generateUrl('kaliop_twig_express_find', [
             'slug' => $slug,
             'path' => ''
         ]);
@@ -71,7 +71,7 @@ class StaticController extends Controller
         // Figure out bundle name
         $bundleConfig = $this->container->getParameter('twig_express.bundles');
         if (!array_key_exists($slug, $bundleConfig)) {
-            $rootUrl = $this->generateUrl('gradientz_twig_express_root');
+            $rootUrl = $this->generateUrl('kaliop_twig_express_root');
             return $this->redirect($rootUrl . '?was=' . $slug);
         }
         $this->bundleName = $bundleConfig[$slug]['name'];
@@ -146,7 +146,7 @@ class StaticController extends Controller
             $fileList[] = str_replace('.twig', '', $file->getFilename());
         }
 
-        return $this->render('@GradientzTwigExpress/dir.html.twig', [
+        return $this->render('@KaliopTwigExpress/dir.html.twig', [
             'crumbs' => $breadcrumbs,
             'dirList' => $dirList,
             'fileList' => $fileList
@@ -177,7 +177,7 @@ class StaticController extends Controller
         $message = '<p>Could not find : <code class="error">'.$miss.'</code><br>';
         $message .= "\nIn : <code>$root</code></p>";
 
-        $response = $this->render('@GradientzTwigExpress/page.html.twig', [
+        $response = $this->render('@KaliopTwigExpress/page.html.twig', [
             'crumbs' => $breadcrumbs,
             'metaTitle' => 'Not found: ' . $urlFragment,
             'title' => 'File does not exist',
@@ -191,7 +191,7 @@ class StaticController extends Controller
      * Render a Twig template
      * @param string $templateName
      * @return Response
-     * @throws Twig_Error
+     * @throws \Exception
      */
     private function renderTwig($templateName)
     {
@@ -274,7 +274,7 @@ class StaticController extends Controller
             $data['codeLang'] = Utils::getHighlightLanguage($fileRef);
         }
 
-        return $this->render('@GradientzTwigExpress/page.html.twig', $data);
+        return $this->render('@KaliopTwigExpress/page.html.twig', $data);
     }
 
     /**
@@ -298,6 +298,6 @@ class StaticController extends Controller
             'code' => Utils::formatCodeBlock($code, true),
             'codeLang' => Utils::getHighlightLanguage($systemPath)
         ];
-        return $this->render('@GradientzTwigExpress/page.html.twig', $data);
+        return $this->render('@KaliopTwigExpress/page.html.twig', $data);
     }
 }

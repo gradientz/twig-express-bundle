@@ -1,6 +1,7 @@
-# GradientzTwigExpressBundle
+# KaliopTwigExpressBundle
 
-Browse and render “static” Twig templates in a Symfony project. This bundle is a port of the [TwigExpress](https://github.com/gradientz/twig-express) tool, and is intended for private front-end prototypes. You might like it if you’re a designer or front-end developer working with Symfony. *Do not use this bundle or its routes in production!*
+Browse and render “static” Twig templates in a Symfony project.
+This bundle is a port of the [TwigExpress](https://github.com/kaliop/twig-express) tool, and is intended for private front-end prototypes. You might like it if you’re a designer or front-end developer working with Symfony. *Do not use this bundle or its routes in production!*
 
 ## Features
 
@@ -14,7 +15,7 @@ Browse and render “static” Twig templates in a Symfony project. This bundle 
 Install with [Composer](https://getcomposer.org/) in your Symfony project:
 
 ```
-composer require gradientz/twig-express-bundle
+composer require kaliop/twig-express-bundle
 ```
 
 ## Getting started
@@ -23,7 +24,7 @@ Add this to your routes (for example in `routing_dev.yml`):
 
 ```yaml
 twig_express:
-    resource: "@GradientzTwigExpressBundle/Resources/config/routing.yml"
+    resource: "@KaliopTwigExpressBundle/Resources/config/routing.yml"
 ```
 
 Then configure `twig_express.bundles` (for example in `config_dev.yml`) with a list of bundles whose “static” templates you want to explore:
@@ -41,7 +42,7 @@ This bundle contains its own demo `static` templates. To activate the demo, add 
 
 ```yaml
 imports:
-    - { resource: "@GradientzTwigExpressBundle/Resources/config/demo.yml" }
+    - { resource: "@KaliopTwigExpressBundle/Resources/config/demo.yml" }
 ```
 
 ## Advanced configuration

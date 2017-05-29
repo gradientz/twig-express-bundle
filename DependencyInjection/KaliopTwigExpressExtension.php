@@ -1,11 +1,11 @@
 <?php
 
-namespace Gradientz\TwigExpressBundle\DependencyInjection;
+namespace Kaliop\TwigExpressBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
-class GradientzTwigExpressExtension extends Extension
+class KaliopTwigExpressExtension extends Extension
 {
     public function getAlias()
     {

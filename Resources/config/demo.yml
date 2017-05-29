@@ -1,7 +1,7 @@
-# REQUIRED: enable this bundle to be used with GradientzTwigExpressBundle
+# REQUIRED: enable this bundle to be used with KaliopTwigExpressBundle
 twig_express:
     bundles:
-        -   name: GradientzTwigExpressBundle
+        -   name: KaliopTwigExpressBundle
             slug: twig-express-demo
             root: Resources/views/demo
 
