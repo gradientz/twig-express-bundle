@@ -38,11 +38,11 @@ Finally, navigate to `http://[your-hostname]/static/` to see a list your bundles
 
 ## Demo pages
 
-This bundle contains its own demo `static` templates. To activate the demo, add this import to your `config_dev.yml`:
+This bundle contains its own demo `static` templates, which demonstrate a few added features. To activate it, add this import to your `config_dev.yml`:
 
 ```yaml
 imports:
-    - { resource: "@KaliopTwigExpressBundle/Resources/config/demo.yml" }
+    - { resource: "@KaliopTwigExpressBundle/Resources/config/test.yml" }
 ```
 
 ## Advanced configuration

@@ -2,8 +2,8 @@
 twig_express:
     bundles:
         -   name: KaliopTwigExpressBundle
-            slug: twig-express-demo
-            root: Resources/views/demo
+            slug: twig-express-test
+            root: Resources/test
 
 # (Optional) Add to Twig global variables, using a namespace to avoid collisions
 # (especially if you have more than one bundle with 'static' views).

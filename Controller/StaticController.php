@@ -146,7 +146,7 @@ class StaticController extends Controller
             $fileList[] = str_replace('.twig', '', $file->getFilename());
         }
 
-        return $this->render('@KaliopTwigExpress/dir.html.twig', [
+        return $this->render('@KaliopTwigExpress/layout.html.twig', [
             'crumbs' => $breadcrumbs,
             'dirList' => $dirList,
             'fileList' => $fileList
@@ -177,7 +177,7 @@ class StaticController extends Controller
         $message = '<p>Could not find : <code class="error">'.$miss.'</code><br>';
         $message .= "\nIn : <code>$root</code></p>";
 
-        $response = $this->render('@KaliopTwigExpress/page.html.twig', [
+        $response = $this->render('@KaliopTwigExpress/layout.html.twig', [
             'crumbs' => $breadcrumbs,
             'metaTitle' => 'Not found: ' . $urlFragment,
             'title' => 'File does not exist',
@@ -271,10 +271,10 @@ class StaticController extends Controller
         if (file_exists($filePath)) {
             $code = file_get_contents($filePath);
             $data['code'] = Utils::formatCodeBlock($code, true, $line, 5);
-            $data['codeLang'] = Utils::getHighlightLanguage($fileRef);
+            $data['codeContext'] = Utils::getHighlightLanguage($fileRef);
         }
 
-        return $this->render('@KaliopTwigExpress/page.html.twig', $data);
+        return $this->render('@KaliopTwigExpress/layout.html.twig', $data);
     }
 
     /**
@@ -296,8 +296,8 @@ class StaticController extends Controller
             'metaTitle' => 'Source: ' . basename($systemPath),
             'crumbs' => $breadcrumbs,
             'code' => Utils::formatCodeBlock($code, true),
-            'codeLang' => Utils::getHighlightLanguage($systemPath)
+            'codeContext' => Utils::getHighlightLanguage($systemPath)
         ];
-        return $this->render('@KaliopTwigExpress/page.html.twig', $data);
+        return $this->render('@KaliopTwigExpress/layout.html.twig', $data);
     }
 }

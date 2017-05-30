@@ -1,0 +1,117 @@
+{% spaceless %}
+
+  {# Layout #}
+  {% set assets = {
+    css: source('@KaliopTwigExpressBundle/Resources/public/styles.css'),
+    svg: source('@KaliopTwigExpressBundle/Resources/public/sprite.svg'),
+    highlight: source('@KaliopTwigExpressBundle/Resources/public/highlight.js'),
+    headings: source('@KaliopTwigExpressBundle/Resources/public/headings.js')
+  } %}
+  {# TODO: update navInfo/crumbs implementation #}
+  {% set navInfo = navInfo|default({ title: '', crumbs: [] }) %}
+  {% set navBorder = navBorder is defined ? navBorder : true %}
+  {% set dirIcon -%}
+    <svg class="icon" aria-label="Folder"><use xlink:href="#icon-folder"/></svg>
+  {%- endset %}
+  {% set fileIcon -%}
+    <svg class="icon" aria-label="File"><use xlink:href="#icon-file"/></svg>
+  {%- endset %}
+
+  {# Content #}
+  {% set title = title|default('') %}
+  {% set metaTitle = metaTitle|default(title)|default(navInfo.title) %}
+  {% set message = message|default('') %}
+  {% set content = content|default('') %}
+  {% set code = code|default('') %}
+  {% set codeLang = codeLang|default('twig') %}
+  {% set codeContext = codeContext|default('') %}
+
+  {# File listing #}
+  {% set dirList = dirList|default([]) %}
+  {% set fileList = fileList|default([]) %}
+
+{% endspaceless %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex">
+  <meta name="viewport" content="width=device-width">
+  {% if metaTitle ?? false %}<title>{{ metaTitle }}</title>{% endif -%}
+  <style>.icon{width:1em;height:1em;}</style>
+  {% block styles %}
+  <style>{{ assets.css | raw }}</style>
+  {% endblock %}
+</head>
+<body>
+
+{{ assets.svg | raw }}
+
+<header>
+  {% if navInfo.crumbs|length > 0 %}
+    <nav{% if navBorder %} class="border"{% endif %}>
+      {% for item in navInfo.crumbs %}
+        {%- spaceless %}
+          {% if not loop.first and not item.ext %}
+            <span class="sep">/</span>
+          {% endif %}
+          {% if item.active %}
+            <span class="item">{{ item.name }}</span>
+          {% else %}
+            <a class="item" href="{{ item.url }}">{{ item.name }}</a>
+          {% endif %}
+        {% endspaceless -%}
+      {% endfor %}
+    </nav>
+  {% endif %}
+  {% if title %}
+    <h1>{{ title|raw }}</h1>
+  {% endif %}
+  {% if message %}
+    <blockquote>{{ message|raw }}</blockquote>
+  {% endif %}
+</header>
+
+<main>{% block main %}
+  {%- if dirList|length > 0 %}
+    <ul class="Links Links--folders">
+      {% for dir in dirList -%}
+        <li><a class="Links-link" href="{{ dir.url }}/">{{ dirIcon|raw }}{{ dir.name }}</a></li>
+      {%- endfor %}
+    </ul>
+  {%- endif %}
+  {%- if fileList|length > 0 %}
+    <ul class="Links Links--files{% if fileList|length > 3 %} Links--cols{% endif %}">
+      {% for file in fileList -%}
+        <li><a href="{{ file.url }}">{{ fileIcon|raw }}{{ file.name|replace({'.html':'<span>.html</span>'}) | raw }}</a></li>
+      {%- endfor %}
+    </ul>
+  {%- endif %}
+  <div class="Content">{% block content %}
+    {%- if content %}{{ content | raw }}{%- endif %}
+  {% endblock %}</div>
+  {%- if code %}
+    <pre class="Code
+      {%- if ' data-num=' in code %} Code--numbers{% endif -%}
+      {%- if '<mark>' in code %} Code--mark{% endif -%}
+  "><code class="{{ codeLang == 'md' ? 'markdown' : codeLang }}">
+      {{- code|raw -}}
+  </code></pre>
+  {%- endif %}
+{% endblock %}</main>
+
+{% block footer %}{% endblock %}
+
+{% block scripts %}
+  <script>
+    {%- if codeContext %}window.twigSubLanguage = '{{ codeContext }}';{% endif -%}
+    {{- assets.highlight|replace({'</script': '<\\/script'})|raw -}}
+    ;hljs.initHighlighting();
+  </script>
+  <script>
+    {{- assets.headings | raw -}}
+  </script>
+{% endblock %}
+
+</body>
+</html>
