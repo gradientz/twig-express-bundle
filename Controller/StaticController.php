@@ -140,10 +140,15 @@ class StaticController extends Controller
         $dirList = [];
         $fileList = [];
         foreach ($iterator->directories() as $dir) {
-            $dirList[] = $dir->getFilename();
+            $name = $dir->getFilename();
+            $dirList[] = ['name'=>$name, 'url'=>'$name'];
         }
         foreach ($iterator->files()->name('*.twig') as $file) {
-            $fileList[] = str_replace('.twig', '', $file->getFilename());
+            $name = $file->getFilename();
+            $fileList[] = [
+                'name' => $name,
+                'url' => str_replace('.twig', '', $name)
+            ];
         }
 
         return $this->render('@KaliopTwigExpress/layout.html.twig', [

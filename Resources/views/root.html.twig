@@ -3,44 +3,45 @@
 {% set metaTitle = 'Static HTML bundles' %}
 {% set showCrumbs = 0 %}
 {% set title %}
-    Bundles with <code>static</code> views
+  Bundles with <code>static</code> views
 {% endset %}
 
 {% if not bundles %}
-    {% set message = 'Could not find any static HTML bundle.' %}
+  {% set message = 'Could not find any static HTML bundle.' %}
 {% elseif app.request.get('was') %}
-    {% set message %}
-        Could not find static HTML bundle matching <code>"{{ app.request.get('was') }}"</code>.
-        <br>Showing the list of known static HTML bundles instead.
-    {% endset %}
+  {% set message %}
+    Could not find static HTML bundle matching <code>"{{ app.request.get('was') }}"</code>.
+    <br>Showing the list of known static HTML bundles instead.
+  {% endset %}
 {% endif %}
 
 {% block main %}
-    {%- if bundles -%}
-        <ul class="Links Links--folders">
-        {% for slug,bundle in bundles %}
-            <li>
-                <a href="{{ slug }}/">
-                    <svg class="icon"><use xlink:href="#icon-folder"/></svg>
-                    {{ bundle.name }}
-                </a>
-            </li>
-        {% endfor %}
-        </ul>
-    {%- endif -%}
+  {%- if bundles -%}
+    <ul class="Links Links--folders">
+    {% for slug,bundle in bundles %}
+      <li>
+        <a href="{{ slug }}/">
+          <svg class="icon"><use xlink:href="#icon-folder"/></svg>
+          {{ bundle.name }}
+        </a>
+      </li>
+    {% endfor %}
+    </ul>
+  {%- endif -%}
 {% endblock %}
 
 {% block footer %}
-    <footer>
-        <h2>About:</h2>
-        <p>To add to this list of bundles, add to the <code>twig_express.bundles</code> config key:</p>
-        <pre>twig_express:
-    bundles: [ AcmeSuperNiceBundle ]</pre>
-        <p>You can also give more explicit config, including the URL slug to use and the path to the views you want to give access to:</p>
-        <pre>twig_express:
-    bundles:
-        -   name: AcmeSuperNiceBundle
-            slug: super-nice
-            root: Resources/views/custom-dir</pre>
-    </footer>
+<footer>
+  <h2>About</h2>
+  <p>To add a bundle to this list, use to the <code>twig_express.bundles</code> config key:</p>
+  <pre>twig_express:
+  bundles:
+    - AcmeSuperNiceBundle
+</pre>
+  <p>You can also give more explicit config, including the URL slug to use and the path to the views you want to give access to:</p>
+  <pre>twig_express:
+  bundles:
+    - { name: AcmeSuperNiceBundle, root: Resources/views/custom-dir, slug: acme }
+</pre>
+</footer>
 {% endblock %}
