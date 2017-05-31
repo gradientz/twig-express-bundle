@@ -2,21 +2,41 @@
 
 namespace Kaliop\TwigExpressBundle\Core;
 
+use joshtronic\LoremIpsum;
+use Parsedown;
+
 class Utils
 {
+    /** @var Parsedown */
+    static private $markdown;
+
+    /** @var LoremIpsum */
+    static private $lorem;
+
     /**
      * Cleans up a local resource path, removing back-slashes, double dots, etc.
      * Should not be necessary for content from a URL but let's be on the safe side.
      * @param  string $path
+     * @param  bool|string $trimSlashes - true (both sides), 'l' or 'r'
      * @return string
      */
-    static function getCleanPath($path)
+    static function getCleanPath($path, $trimSlashes=false)
     {
-        return preg_replace(
+        $clean = preg_replace(
             ['/\\\/', '/\/{2,}/', '/\.{2,}/'],
             ['/', '/', '.'],
             $path
         );
+        if ($trimSlashes === true) {
+            return trim($clean, '/');
+        }
+        else if ($trimSlashes === 'l') {
+            return ltrim($clean, '/');
+        }
+        else if ($trimSlashes === 'r') {
+            return rtrim($clean, '/');
+        }
+        return $clean;
     }
 
     /**
@@ -29,53 +49,19 @@ class Utils
     {
         $type = 'text/plain';
         $knownTypes = [
-            'htm' => 'text/html',
+            'htm'  => 'text/html',
             'html' => 'text/html',
-            'css' => 'text/css',
-            'js' => 'text/javascript',
+            'css'  => 'text/css',
+            'js'   => 'text/javascript',
             'json' => 'application/json',
-            'svg' => 'image/svg+xml',
-            'xml' => 'application/xml',
+            'svg'  => 'image/svg+xml',
+            'xml'  => 'application/xml',
+            'atom' => 'application/atom+xml',
         ];
         if (array_key_exists($ext, $knownTypes)) {
             $type = $knownTypes[$ext];
         }
         return $type;
-    }
-
-    /**
-     * Make an associative array with URL=>Name values
-     * representing the breadcrumbs for a given base URL and path
-     * @param  string $baseUrl (no trailing slash)
-     * @param  string $bundleName
-     * @param  string $path
-     * @return array
-     */
-    static function makeBreadcrumbs($baseUrl, $bundleName, $path)
-    {
-        $url = $baseUrl . '/';
-        $crumbs = [['url' => $url, 'name' => $bundleName]];
-        $fragments = array_filter(explode('/', $path));
-        $last = array_pop($fragments);
-
-        foreach ($fragments as $fragment) {
-            $url .= $fragment . '/';
-            $crumbs[] = ['url' => $url, 'name' => $fragment];
-        }
-        if ($last) {
-            $ext = pathinfo($last, PATHINFO_EXTENSION);
-            if ($ext === 'twig') {
-                $noTwigExt = substr($last, 0, -5);
-                $crumbs[] = ['url' => $url . $noTwigExt, 'name' => $noTwigExt];
-                $crumbs[] = ['url' => $url . $last, 'name' => '.twig'];
-            }
-            else {
-                $url .= $last . ($ext === '' ? '/' : '');
-                $crumbs[] = ['url' => $url, 'name' => $last];
-            }
-        }
-
-        return $crumbs;
     }
 
     /**
@@ -142,5 +128,144 @@ class Utils
             $subLang = $subLangs[$ext];
         }
         return $subLang;
+    }
+
+    /**
+     * Lists files and folders for one or several glob patterns
+     * (not recursive, and starting from the provided root).
+     * @param string|array $patterns Glob pattern(s) of files or folders to find
+     * @param string $where Folder to look from
+     * @param string $type Type of element to return: 'dir', 'file' or both
+     * @return array
+     */
+    static function getFileList($patterns='*', $where=null, $type=null)
+    {
+        if (is_string($patterns)) $patterns = [$patterns];
+        $files = [];
+        // Find files to include and exclude
+        foreach($patterns as $p) {
+            $p = is_string($p) ? ltrim(static::getCleanPath($p), '/') : '';
+            if ($p == '' || strpos($p,'..') !== false) continue;
+            $files = array_merge($files, glob("$where/$p", GLOB_BRACE));
+        }
+        // Filter results
+        if ($type == 'file') $files = array_filter($files, 'is_file');
+        if ($type == 'dir')  $files = array_filter($files, 'is_dir');
+        // Clean up results
+        $result = array_map(function($file) use ($where) {
+            $path = str_replace('\\','/', $file);
+            $path = str_replace($where . '/', '', $path);
+            return rtrim($path, '/');
+        }, $files);
+
+        // Sort alphabetically
+        sort($result);
+        return $result;
+    }
+
+    /**
+     * Retrieve a value from $_GET or $_POST, using a fallback value if
+     * the queried key doesn't exist. Allows defining the method ('get',
+     * 'post' or 'cookie') as a prefix in the name, e.g. 'post:somevar'.
+     * @param string $name
+     * @param mixed [$fallback]
+     * @return mixed
+     */
+    static function getHttpParameter($name='', $fallback='')
+    {
+        $bag = $_GET;
+        $key = (string) $name;
+        $start = strtolower(explode(':', $key)[0]);
+        if ($start === 'get') {
+            $key = substr($key, 4);
+        }
+        if ($start === 'post') {
+            $key = substr($key, 5);
+            $bag = $_POST;
+        }
+        if ($start === 'cookie') {
+            $key = substr($key, 7);
+            $bag = $_COOKIE;
+        }
+        return array_key_exists($key, $bag) ? $bag[$key] : $fallback;
+    }
+
+    /**
+     * Generate fake latin text using joshtronic\LoremIpsum
+     *
+     * Syntax for command string is:
+     *     'min-max type'   -> returns a string
+     *     '[min-max type]' -> returns an array
+     *
+     * Available types:
+     * - 'words' (synonyms: 'word', 'w')
+     * - 'sentences' (synonyms: 'sentence', 's')
+     * - 'paragraphs' (synonyms: 'paragraph', 'p')
+     *
+     * @param string $command Count and type of content to generate
+     * @return array|string
+     */
+    static function makeLoremIpsum($command='1-7w')
+    {
+        if (!is_string($command)) return '';
+        if (!preg_match('/^\[?\s*(\d{1,3})(-\d{1,3})?\s*([a-z]{1,10})\s*\]?$/', strtolower(trim($command)), $matches)) {
+            return '';
+        }
+        if ($matches[2]) {
+            $min = (int) $matches[1];
+            $max = (int) substr($matches[2], 1);
+            $count = $min <= $max ? rand($min, $max) : rand($max, $min);
+        } else {
+            $count = (int) $matches[1];
+        }
+        $method = 'words';
+        switch ($matches[3]) {
+            case 'w': case 'word': case 'words':
+            $method = 'words'; break;
+            case 's': case 'sentence': case 'sentences':
+            $method = 'sentences'; break;
+            case 'p': case 'paragraph': case 'paragraphs':
+            $method = 'paragraphs'; break;
+        }
+        $method .= strpos($matches[0], '[') === 0 ? 'Array' : '';
+
+        if (static::$lorem === null) {
+            // Prepare the generator, calling it once to call the private shuffle
+            // method (and avoid getting 'lorem ipsum' every time).
+            static::$lorem = new LoremIpsum();
+            static::$lorem->word();
+        }
+
+        if (method_exists(static::$lorem, $method)) {
+            $args = array_merge([$count], array_slice(func_get_args(), 1));
+            $result = call_user_func_array( [static::$lorem, $method], $args );
+            // Make sure we use a capital letter first, because LoremIpsum
+            // doesn't do it for words. So we're more consistent, and users
+            // who don't want that can still use the |lower Twig filter.
+            if (is_string($result)) {
+                return ucfirst($result);
+            }
+            if (is_array($result)) {
+                return array_map('ucfirst', $result);
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Transform a string with Parsedown
+     * @param string  $text   Markdown text to process
+     * @param boolean $inline Do not output paragraph-level tags
+     * @return string
+     */
+    static function processMarkdown($text='', $inline=false)
+    {
+        // We might end up with Twig objects in some cases
+        $value = (string) $text;
+        if (static::$markdown === null) {
+            static::$markdown = Parsedown::instance();
+        }
+        if ($inline) return static::$markdown->line($value);
+        else return static::$markdown->text($value);
     }
 }

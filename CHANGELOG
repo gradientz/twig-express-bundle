@@ -1,9 +1,15 @@
 # Changelog for TwigExpressBundle
 
-## 3.0.0-pre
+## 3.0.0
 
 - Rebrand GradientzTwigExpressBundle as KaliopTwigExpressBundle
   (same as our sister project: https://github.com/kaliop/twig-express)
+- Add a TwigExtension with the `lorem()`, `markdown()` and `param()` functions
+  (similar to https://github.com/kaliop/twig-express/blob/master/doc/extras.md)
+- New demo pages (using some of the test pages from the TwigExpress repo).
+- Add support for using the TwigExpress page layout with
+  `{% extends twigexpress_layout() %}`
+- Styling update.
 
 ## 2.0.4
 

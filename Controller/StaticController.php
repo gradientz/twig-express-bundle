@@ -27,6 +27,8 @@ class StaticController extends Controller
     protected $docRootPath;
     /** @var null|string The name of an existing template we're trying to show */
     protected $templateName;
+    /** @var null|string The requested path (minus any '/static/' or bundle id prefix) */
+    protected $requestPath;
 
     /**
      * List Assetic bundles
@@ -51,6 +53,9 @@ class StaticController extends Controller
         $cleanPath = Utils::getCleanPath($path);
         $pathExt = pathinfo($cleanPath, PATHINFO_EXTENSION);
         $showSource = $pathExt === 'twig';
+
+        // Store the requested path (for e.g. making breadcrumbs)
+        $this->requestPath = $cleanPath;
 
         // Base URL for redirects and breadcrumbs (no trailing slash)
         $this->baseUrl = $this->generateUrl('kaliop_twig_express_find', [
@@ -79,11 +84,11 @@ class StaticController extends Controller
         // Check that it's a valid bundle
         $allBundles = array_keys($this->get('kernel')->getBundles());
         if (!in_array($this->bundleName, $allBundles)) {
-            throw new \Exception('Unknown bundle "'.$this->bundleName.'". Make sur this bundle is installed and your "twig_express.bundles" config is correct.');
+            throw new \Exception("Unknown bundle '$this->bundleName'. Make sure this bundle is installed and your 'twig_express.bundles' config is correct.");
         }
 
         // Where is our "document root"?
-        $docRoot = $bundleConfig[$slug]['root'];
+        $docRoot = Utils::getCleanPath($bundleConfig[$slug]['root'], 'r');
         $this->bundlePath = rtrim($this->container->get('kernel')->locateResource('@'.$this->bundleName), '/');
         $this->docRootName = '@'.$this->bundleName . '/' . $docRoot;
         $this->docRootPath = $this->bundlePath . '/' . $docRoot;
@@ -95,7 +100,6 @@ class StaticController extends Controller
             if (substr($cleanPath, -1) !== '/') {
                 return $this->redirect($this->baseUrl . $cleanPath . '/');
             }
-            $template = null;
             if (file_exists($basePath . '/index.html.twig')) {
                 return $this->renderTwig($this->docRootName . $cleanPath . 'index.html.twig');
             } elseif (file_exists($basePath . '/index.twig')) {
@@ -128,7 +132,7 @@ class StaticController extends Controller
     private function renderDir($dirPath, $urlFragment)
     {
         // Prepare breadcrumbs
-        $breadcrumbs = Utils::makeBreadcrumbs(
+        $breadcrumbs = $this->makeBreadcrumbs(
             $this->baseUrl,
             $this->bundleName,
             $urlFragment
@@ -141,7 +145,7 @@ class StaticController extends Controller
         $fileList = [];
         foreach ($iterator->directories() as $dir) {
             $name = $dir->getFilename();
-            $dirList[] = ['name'=>$name, 'url'=>'$name'];
+            $dirList[] = ['name'=>$name, 'url'=>$name];
         }
         foreach ($iterator->files()->name('*.twig') as $file) {
             $name = $file->getFilename();
@@ -152,9 +156,10 @@ class StaticController extends Controller
         }
 
         return $this->render('@KaliopTwigExpress/layout.html.twig', [
-            'crumbs' => $breadcrumbs,
+            'breadcrumbs' => $breadcrumbs,
             'dirList' => $dirList,
-            'fileList' => $fileList
+            'fileList' => $fileList,
+            'navBorder' => false
         ]);
     }
 
@@ -166,7 +171,7 @@ class StaticController extends Controller
     private function render404($urlFragment)
     {
         // Prepare breadcrumbs
-        $breadcrumbs = Utils::makeBreadcrumbs(
+        $breadcrumbs = $this->makeBreadcrumbs(
             $this->baseUrl,
             $this->bundleName,
             $urlFragment
@@ -183,7 +188,7 @@ class StaticController extends Controller
         $message .= "\nIn : <code>$root</code></p>";
 
         $response = $this->render('@KaliopTwigExpress/layout.html.twig', [
-            'crumbs' => $breadcrumbs,
+            'breadcrumbs' => $breadcrumbs,
             'metaTitle' => 'Not found: ' . $urlFragment,
             'title' => 'File does not exist',
             'message' => $message
@@ -200,17 +205,23 @@ class StaticController extends Controller
      */
     private function renderTwig($templateName)
     {
+        // Always make breadcrumbs, in case the template calls the TwigExpress layout
+        $breadcrumbs = $this->makeBreadcrumbs(
+            $this->baseUrl,
+            $this->bundleName,
+            str_replace($this->docRootName, '', $templateName)
+        );
         // Do we have an extension, like .html or .json?
         $ext = pathinfo(substr($templateName, 0, -5), PATHINFO_EXTENSION);
         $cType = $ext ? Utils::getMediaType($ext) . ';charset=utf-8' : null;
         try {
-            $response = $this->render($templateName);
+            $response = $this->render($templateName, ['breadcrumbs'=>$breadcrumbs]);
             if ($cType) $response->headers->set('Content-Type', $cType);
             return $response;
         }
         catch (Twig_Error $error) {
             if ($this->debug) {
-                return $this->showTwigError($error, $templateName);
+                return $this->showTwigError($error, $breadcrumbs);
             } else {
                 throw $error;
             }
@@ -220,15 +231,15 @@ class StaticController extends Controller
     /**
      * Show an error page for a Twig_Error, with the faulty Twig code if we can.
      * @param Twig_Error $error
-     * @param string $templateName Path of rendered template (error may be in a different template)
+     * @param array $breadcrumbs - Breadcrumbs to pass along to template
      * @return Response
      */
-    private function showTwigError(Twig_Error $error, $templateName)
+    private function showTwigError(Twig_Error $error, $breadcrumbs)
     {
         $line = $error->getTemplateLine();
         $message = $error->getRawMessage();
 
-        // Might be different from $templateName, if the error occurred in an
+        // Might be different from the known template name, if the error occurred in an
         // included file. Also we can get one of three types of result:
         // - A full system path
         // - @SomeBundleNameBundle/some/path/xyz
@@ -257,18 +268,10 @@ class StaticController extends Controller
             $fileName = '@'.$this->bundleName . str_replace($this->bundlePath, '', $fileRef);
         }
 
-        // Prepare breadcrumbs
-        $breadcrumbs = Utils::makeBreadcrumbs(
-            $this->baseUrl,
-            $this->bundleName,
-            str_replace($this->docRootName, '', $templateName)
-        );
-
         $data = [
             'metaTitle' => 'Error: ' . basename($fileName),
             'title' => get_class($error),
-            'crumbs' => $breadcrumbs,
-            'activeCrumb' => count($breadcrumbs) - 1,
+            'breadcrumbs' => $breadcrumbs,
             'message' => "$message<br>\nLine $line of <code>$fileName</code>"
         ];
 
@@ -291,7 +294,7 @@ class StaticController extends Controller
     private function showSource($systemPath, $urlFragment)
     {
         // Prepare breadcrumbs
-        $breadcrumbs = Utils::makeBreadcrumbs(
+        $breadcrumbs = $this->makeBreadcrumbs(
             $this->baseUrl,
             $this->bundleName,
             $urlFragment
@@ -299,10 +302,63 @@ class StaticController extends Controller
         $code = file_get_contents($systemPath);
         $data = [
             'metaTitle' => 'Source: ' . basename($systemPath),
-            'crumbs' => $breadcrumbs,
+            'breadcrumbs' => $breadcrumbs,
             'code' => Utils::formatCodeBlock($code, true),
-            'codeContext' => Utils::getHighlightLanguage($systemPath)
+            'codeContext' => Utils::getHighlightLanguage($systemPath),
+            'navBorder' => false
         ];
         return $this->render('@KaliopTwigExpress/layout.html.twig', $data);
+    }
+
+    /**
+     * Make an array representing navigation items
+     * @param  string $baseUrl (no trailing slash)
+     * @param  string $bundleName
+     * @param  string $path
+     * @return array
+     */
+    private function makeBreadcrumbs($baseUrl, $bundleName, $path)
+    {
+        $url = $baseUrl . '/';
+        $crumbs = [['url' => $url, 'name' => $bundleName]];
+        $fragments = array_filter(explode('/', $path));
+        $last = array_pop($fragments);
+        foreach ($fragments as $fragment) {
+            $url .= $fragment . '/';
+            $crumbs[] = ['url' => $url, 'name' => $fragment];
+        }
+        // Last fragment can be one item or two (if we want to link the '.twig' extension)
+        if ($last) {
+            $ext = pathinfo($last, PATHINFO_EXTENSION);
+            $reqExt = $this->requestPath ? pathinfo($this->requestPath, PATHINFO_EXTENSION) : '';
+            if ($ext === 'twig') {
+                $noTwigExt = substr($last, 0, -5);
+                $crumbs[] = [
+                    'url' => $url . $noTwigExt,
+                    'name' => $noTwigExt,
+                    'active' => $ext !== $reqExt
+                ];
+                $crumbs[] = [
+                    'url' => $url . $last,
+                    'name' => '.twig',
+                    'ext' => true,
+                    'active' => $ext === $reqExt
+                ];
+            }
+            else {
+                $url .= $last . ($ext === '' ? '/' : '');
+                $crumbs[] = ['url' => $url, 'name' => $last];
+            }
+        }
+        // Make sure all items have 'active' and 'ext' properties
+        for ($i=0, $end=count($crumbs) - 1; $i <= $end; $i++) {
+            if (!array_key_exists('active', $crumbs[$i])) {
+                $crumbs[$i]['active'] = $i === $end;
+            }
+            if (!array_key_exists('ext', $crumbs[$i])) {
+                $crumbs[$i]['ext'] = false;
+            }
+        }
+        return $crumbs;
     }
 }

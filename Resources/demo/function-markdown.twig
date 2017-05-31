@@ -1,4 +1,4 @@
-{% extends '@KaliopTwigExpress/layout.html.twig' %}
+{% extends twigexpress_layout() %}
 
 {% block content %}
   <h1>Twig function: <code>markdown</code></h1>
@@ -18,8 +18,8 @@
   {{ markdown('Hello *world*!') | raw }}
   </blockquote>
 
-  <h2><code>markdown(source('README.md')) | raw</code></h2>
+  <h2><code>markdown(source('@KaliopTwigExpressBundle/README.md')) | raw</code></h2>
   <blockquote class="TestResult">
-  {{ markdown(source('README.md')) | raw }}
+  {{ markdown(source('@KaliopTwigExpressBundle/README.md')) | raw }}
   </blockquote>
 {% endblock %}

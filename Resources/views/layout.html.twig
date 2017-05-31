@@ -5,30 +5,21 @@
     css: source('@KaliopTwigExpressBundle/Resources/public/layout.min.css'),
     js:  source('@KaliopTwigExpressBundle/Resources/public/layout.min.js')
   } %}
-  {# TODO: update navInfo/crumbs implementation #}
-  {% set navInfo = navInfo|default({ title: '', crumbs: [] }) %}
+  {% set breadcrumbs = breadcrumbs|default(false) %}
   {% set navBorder = navBorder is defined ? navBorder : true %}
   {% macro icon(name) -%}
     <svg class="icon" aria-label="Folder"><use xlink:href="#icon-{{ name }}"></use><g></g></svg>
   {%- endmacro %}
   {% from _self import icon %}
 
-  {# Content #}
+  {# Header content #}
   {% set title = title|default('') %}
-  {% set metaTitle = metaTitle|default(title)|default(navInfo.title) %}
+  {% set metaTitle = metaTitle|default(title)|default('') %}
   {% set message = message|default('') %}
-  {% set content = content|default('') %}
-  {% set code = code|default('') %}
-  {% set codeLang = codeLang|default('twig') %}
-  {% set codeContext = codeContext|default('') %}
-
-  {# File listing #}
-  {% set dirList = dirList|default([]) %}
-  {% set fileList = fileList|default([]) %}
 
 {% endspaceless %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="lightColors">
 <head>
   <meta charset="UTF-8">
   <meta name="robots" content="noindex">
@@ -39,9 +30,10 @@
 <body>
 
 <header>
-  {%- if navInfo.crumbs|length > 0 %}
+{%- block header -%}
+  {%- if breadcrumbs and breadcrumbs|length > 0 -%}
     <nav{% if navBorder %} class="border"{% endif %}>
-      {% for item in navInfo.crumbs %}
+      {% for item in breadcrumbs %}
         {%- spaceless %}
           {% if not loop.first and not item.ext %}
             <span class="sep">/</span>
@@ -54,50 +46,76 @@
         {% endspaceless -%}
       {% endfor %}
     </nav>
-  {%- endif %}
-  {%- if title %}
+  {%- endif -%}
+  {%- if title -%}
     <h1>{{ title|raw }}</h1>
-  {%- endif %}
-  {%- if message %}
+  {%- endif -%}
+  {%- if message -%}
     <blockquote>{{ message|raw }}</blockquote>
-  {%- endif %}
+  {%- endif -%}
+{%- endblock -%}
 </header>
 
-<main>{% block main %}
-  {%- if dirList|length > 0 %}
-    <ul class="Links Links--folders">
-      {% for dir in dirList -%}
-        <li><a class="Links-link" href="{{ dir.url }}/">
-          {{ icon('folder') }}
-          {{ dir.name }}
-        </a></li>
-      {%- endfor %}
-    </ul>
-  {%- endif %}
-  {%- if fileList|length > 0 %}
-    <ul class="Links Links--files{% if fileList|length > 3 %} Links--cols{% endif %}">
-      {% for file in fileList -%}
-        <li><a href="{{ file.url }}">
-          {{ icon('file') }}
-          {{ file.name }}
-        </a></li>
-      {%- endfor %}
-    </ul>
-  {%- endif %}
-  <div class="Content">{% block content %}
-    {%- if content %}{{ content | raw }}{%- endif %}
-  {% endblock %}</div>
-  {%- if code %}
-    <pre class="Code
-      {%- if ' data-num=' in code %} Code--numbers{% endif -%}
-      {%- if '<mark>' in code %} Code--mark{% endif -%}
-  "><code class="{{ codeLang == 'md' ? 'markdown' : codeLang }}">
-      {{- code|raw -}}
-  </code></pre>
-  {%- endif %}
-{% endblock %}</main>
+{# Prepare text content (if any) #}
+{% set MainContent %}
+  {%- block content -%}
+    {{- content|default('')|raw -}}
+  {%- endblock -%}
+{% endset %}
 
-{% block footer %}{% endblock %}
+{# Prepare code content (if any) #}
+{% set CodeContent %}
+  {%- set codeLang = codeLang|default('twig') -%}
+  {%- if code|default('') -%}
+    <code class="{{ codeLang == 'md' ? 'markdown' : codeLang }}">
+      {{- code|raw -}}
+    </code>
+  {%- endif -%}
+{% endset %}
+
+{# List of links #}
+{% set LinkContent %}
+  {%- if dirList|default([])|length > 0 -%}
+    <ul class="Links-list Links-list--folders">
+      {%- for dir in dirList -%}
+        <li><a href="{{ dir.url }}/">{{ icon('folder') }}{{ dir.name }}</a></li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+  {%- if fileList|default([])|length > 0 -%}
+    <ul class="Links-list Links-list--files{% if fileList|length > 3 %} Links--cols{% endif %}">
+      {%- for file in fileList -%}
+        <li><a href="{{ file.url }}">{{ icon('file') }}{{ file.name }}</a></li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+{% endset %}
+
+{% set FooterContent %}
+  {%- block footer %}{% endblock -%}
+{% endset %}
+
+<main>
+{%- block main -%}
+  {%- if LinkContent|trim|length > 0 -%}
+    <div class="Links">{{ LinkContent|raw }}</div>
+  {%- endif -%}
+  {%- if MainContent|trim|length > 0 -%}
+    <div class="Content">{{ MainContent|raw }}</div>
+  {%- endif -%}
+  {%- if CodeContent|trim|length > 0 -%}
+    <pre class="Code
+      {%- if ' data-num=' in CodeContent|trim %} Code--numbers{% endif -%}
+      {%- if '<mark>' in CodeContent|trim %} Code--mark{% endif -%}
+  ">{{ CodeContent|raw }}</pre>
+  {%- endif -%}
+{%- endblock -%}
+{%- if FooterContent|trim|length > 0 -%}
+  <footer>
+    {{ FooterContent|raw }}
+  </footer>
+{%- endif -%}
+</main>
 
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
   <symbol id="icon-folder" viewBox="0 0 32 32">
@@ -114,7 +132,7 @@
 
 {% block scripts %}
   <script>
-    {%- if codeContext %}window.twigSubLanguage = '{{ codeContext }}';{% endif -%}
+    {%- if codeContext|default('') %}window.twigSubLanguage = '{{ codeContext }}';{% endif -%}
     {{- assets.js|replace({'</script': '<\\/script'})|raw -}}
   </script>
 {% endblock %}

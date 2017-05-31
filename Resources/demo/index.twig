@@ -1,0 +1,31 @@
+{% extends twigexpress_layout() %}
+{% set links = [
+  {name: 'function-lorem', label:'The <code>lorem()</code> function'},
+  {name: 'function-markdown', label:'The <code>markdown()</code> function'},
+  {name: 'function-param', label:'The <code>param()</code> function'},
+  {name: 'mimetype.atom', label:'Content-Type test: Atom'},
+  {name: 'mimetype.json', label:'Content-Type test: JSON'},
+  {name: 'mimetype.xml', label:'Content-Type test: XML'},
+] %}
+
+{% block content %}
+  <h1>KaliopTwigExpressBundle features</h1>
+  <p>
+    Documentation: <a href="https://github.com/kaliop/twig-express/blob/master/doc/extras.md">TwigExpress-specific features</a>.
+  </p>
+  <p>
+    Note that the <code>files()</code> and <code>folders()</code> functions are not available in KaliopTwigExpressBundle.
+  </p>
+  <table class="LinkTable">
+    <tr>
+      <th>Page</th>
+      <th>Twig source</th>
+    </tr>
+    {% for link in links %}
+    <tr>
+      <td><a href="{{ link.name }}">{{ link.label | raw }}</a></td>
+      <td><a href="{{ link.name }}.twig">{{ link.name }}.twig</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

@@ -6,7 +6,9 @@
   "require": {
     "php": ">=5.4",
     "symfony/symfony": ">=2.5",
-    "twig/twig": ">=1.15"
+    "twig/twig": ">=1.18",
+    "joshtronic/php-loremipsum": "^1.0",
+    "erusev/parsedown": "^1.6"
   },
   "autoload": {
     "psr-4": { "Kaliop\\TwigExpressBundle\\": "" }

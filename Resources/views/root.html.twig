@@ -1,7 +1,8 @@
 {% extends '@KaliopTwigExpress/layout.html.twig' %}
 
 {% set metaTitle = 'Static HTML bundles' %}
-{% set showCrumbs = 0 %}
+{% set bundles = bundles|default(false) %}
+{% set breadcrumbs = false %}
 {% set title %}
   Bundles with <code>static</code> views
 {% endset %}
@@ -17,21 +18,22 @@
 
 {% block main %}
   {%- if bundles -%}
-    <ul class="Links Links--folders">
-    {% for slug,bundle in bundles %}
-      <li>
-        <a href="{{ slug }}/">
-          <svg class="icon"><use xlink:href="#icon-folder"/></svg>
-          {{ bundle.name }}
-        </a>
-      </li>
-    {% endfor %}
-    </ul>
+    <div class="Links">
+      <ul class="Links-list Links-list--folders">
+        {% for slug,bundle in bundles %}
+          <li>
+            <a href="{{ slug }}/">
+              <svg class="icon"><use xlink:href="#icon-folder"/></svg>
+              {{ bundle.name }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
   {%- endif -%}
 {% endblock %}
 
 {% block footer %}
-<footer>
   <h2>About</h2>
   <p>To add a bundle to this list, use to the <code>twig_express.bundles</code> config key:</p>
   <pre>twig_express:
@@ -43,5 +45,4 @@
   bundles:
     - { name: AcmeSuperNiceBundle, root: Resources/views/custom-dir, slug: acme }
 </pre>
-</footer>
 {% endblock %}

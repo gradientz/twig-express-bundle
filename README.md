@@ -42,7 +42,7 @@ This bundle contains its own demo `static` templates, which demonstrate a few ad
 
 ```yaml
 imports:
-    - { resource: "@KaliopTwigExpressBundle/Resources/config/test.yml" }
+    - { resource: "@KaliopTwigExpressBundle/Resources/config/demo.yml" }
 ```
 
 ## Advanced configuration

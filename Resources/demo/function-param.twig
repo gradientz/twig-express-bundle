@@ -1,4 +1,4 @@
-{% extends '@KaliopTwigExpress/layout.html.twig' %}
+{% extends twigexpress_layout() %}
 
 {% block content %}
   <h1>Twig function: <code>param</code></h1>
@@ -9,27 +9,27 @@
 
   <h3><code>param('get1')</code></h3>
   <blockquote class="TestResult">
-    <pre>{{ dump(param('get1')) }}</pre>
+    <pre>{{ param('get1') }}</pre>
   </blockquote>
 
   <h3><code>param('get:get1')</code></h3>
   <blockquote class="TestResult">
-    <pre>{{ dump(param('get:get1')) }}</pre>
+    <pre>{{ param('get:get1') }}</pre>
   </blockquote>
 
   <h3><code>param('other:get1')</code></h3>
   <blockquote class="TestResult">
-    <pre>{{ dump(param('other:get1')) }}</pre>
+    <pre>{{ param('other:get1') }}</pre>
   </blockquote>
 
   <h3><code>param('get2', 'Fallback value')</code></h3>
   <blockquote class="TestResult">
-    <pre>{{ dump(param('get2', 'Fallback value')) }}</pre>
+    <pre>{{ param('get2', 'Fallback value') }}</pre>
   </blockquote>
 
   <h3><code>param('get3', param('get1'))</code></h3>
   <blockquote class="TestResult">
-    <pre>{{ dump(param('get3', param('get1'))) }}</pre>
+    <pre>{{ param('get3', param('get1')) }}</pre>
   </blockquote>
 
   <h2 id="post-demo">POST values</h2>
@@ -42,16 +42,16 @@
 
   <h3><code>param('post:post1')</code></h3>
   <blockquote class="TestResult">
-    <pre>{{ dump(param('post:post1')) }}</pre>
+    <pre>{{ param('post:post1') }}</pre>
   </blockquote>
 
   <h3><code>param('POST:post2', 'Fallback value')</code></h3>
   <blockquote class="TestResult">
-    <pre>{{ dump(param('POST:post2', 'Fallback value')) }}</pre>
+    <pre>{{ param('POST:post2', 'Fallback value') }}</pre>
   </blockquote>
 
   <h3><code>param('post:post3', param('POST:post1'))</code></h3>
   <blockquote class="TestResult">
-    <pre>{{ dump(param('post:post3', param('POST:post1'))) }}</pre>
+    <pre>{{ param('post:post3', param('POST:post1')) }}</pre>
   </blockquote>
 {% endblock %}
