@@ -1,7 +1,7 @@
 # KaliopTwigExpressBundle
 
 Browse and render “static” Twig templates in a Symfony project.
-This bundle is a port of the [TwigExpress](https://github.com/kaliop/twig-express) tool, and is intended for private front-end prototypes. You might like it if you’re a designer or front-end developer working with Symfony. *Do not use this bundle or its routes in production!*
+This bundle is a port of the [TwigExpress](https://github.com/kaliop/twig-express) standalone tool, and is intended for private front-end prototypes. You might like it if you’re a designer or front-end developer working with Symfony. *Do not use this bundle or its routes in production!*
 
 ## Features
 
@@ -35,21 +35,24 @@ class AppKernel extends Kernel
 
 ## Getting started
 
-Add this to your routes (for example in `routing_dev.yml`):
+Let’s say you have a bundle named `MyAwesomeBundle` and which contains “static” Twig templates in `MyAwesomeBundle/Resources/views/static`. By “static” Twig templates, we mean templates which do not depend on data provided by a controller. It could be simple HTML pages with `{% include %}` tags and other native Twig features.
+
+First you will need to activate the TwigExpress routes. Add this to your routing config (for example in `routing_dev.yml`):
 
 ```yaml
 twig_express:
     resource: "@KaliopTwigExpressBundle/Resources/config/routing.yml"
 ```
 
-Then configure `twig_express.bundles` (for example in `config_dev.yml`) with a list of bundles whose “static” templates you want to explore:
+Then, in your main config (for example in `config_dev.yml`), tell KaliopTwigExpressBundle that it can render templates from your bundle:
 
 ```yaml
 twig_express:
-    bundles: [ MyStaticBundle, AwesomeStaticBundle ]
+    bundles:
+        -   MyAwesomeBundle
 ```
 
-Finally, navigate to `http://[your-hostname]/static/` to see a list your bundles which have `static` views.
+Finally, navigate to `http://[your-hostname]/static/` to explore your static views. You should be able to explore and render the Twig templates from `MyAwesomeBundle/Resources/views/static`.
 
 ## Demo pages
 
@@ -57,7 +60,7 @@ This bundle contains its own demo `static` templates, which demonstrate a few ad
 
 ```yaml
 imports:
-    - { resource: "@KaliopTwigExpressBundle/Resources/config/demo.yml" }
+    - resource: "@KaliopTwigExpressBundle/Resources/config/demo.yml"
 ```
 
 ## Advanced configuration
@@ -67,8 +70,9 @@ For each bundle, instead of providing the bundle’s name only, you can change t
 ```yaml
 twig_express:
     bundles:
-        # Name is required and must be a valid bundle;
-        # root and slug will use fallback values if not defined.
+        # 'name' is required and must be a valid bundle name;
+        # 'root' defaults to 'Resources/views/static';
+        # 'slug' will use an automatic value if not defined.
         -   name: MyStaticBundle
             root: Resources/views/static-html
             slug: ohmy
