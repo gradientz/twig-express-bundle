@@ -1,0 +1,5 @@
+services:
+    kaliop_twig_express.twig_extension:
+        class: Kaliop\TwigExpressBundle\Twig\TwigExtension
+        public: false
+        tags: [{ name: twig.extension }]

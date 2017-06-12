@@ -18,6 +18,21 @@ Install with [Composer](https://getcomposer.org/) in your Symfony project:
 composer require kaliop/twig-express-bundle
 ```
 
+Then you will need to register this bundle in `app/AppKernel.php`. This may look like:
+
+```php
+class AppKernel extends Kernel
+{
+    public function registerBundles()
+    {
+        $bundles = [
+            /* ... */
+            new Kaliop\TwigExpressBundle\KaliopTwigExpressBundle(),
+        ];
+    }
+}
+```
+
 ## Getting started
 
 Add this to your routes (for example in `routing_dev.yml`):

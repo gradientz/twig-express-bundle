@@ -2,8 +2,10 @@
 
 namespace Kaliop\TwigExpressBundle\DependencyInjection;
 
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class KaliopTwigExpressExtension extends Extension
 {
@@ -18,6 +20,10 @@ class KaliopTwigExpressExtension extends Extension
         if ($container->hasParameter('twig_express.url_base') === false) {
             $container->setParameter('twig_express.url_base', 'static');
         }
+
+        // Load the service config
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('services.yml');
 
         // Expose configured bundle information
         // (Is there a better way to get access to our config from controllers???)
