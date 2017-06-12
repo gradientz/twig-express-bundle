@@ -1,0 +1,11 @@
+{% extends '@KaliopTwigExpress/layout.html.twig' %}
+
+{# Use breadcrumbs parts for the tab title #}
+{% set metaTitle = '' %}
+{% if breadcrumbs is defined %}
+  {% if breadcrumbs|length == 1 %}
+    {% set metaTitle = breadcrumbs[0].name %}
+  {% elseif breadcrumbs|length > 1 %}
+    {% set metaTitle = (breadcrumbs|last).name ~ ' - ' ~ breadcrumbs[0].name %}
+  {% endif %}
+{% endif %}

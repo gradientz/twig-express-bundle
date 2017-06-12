@@ -14,7 +14,7 @@
 
   {# Header content #}
   {% set title = title|default('') %}
-  {% set metaTitle = metaTitle|default(title)|default('') %}
+  {% set metaTitle = metaTitle|default(title) %}
   {% set message = message|default('') %}
 
 {% endspaceless %}
@@ -24,7 +24,7 @@
   <meta charset="UTF-8">
   <meta name="robots" content="noindex">
   <meta name="viewport" content="width=device-width">
-  {% if metaTitle ?? false %}<title>{{ metaTitle }}</title>{% endif %}
+  <title>{{ metaTitle|default('') }}</title>
   <style>.icon{width:1em;height:1em;}</style>
 </head>
 <body>

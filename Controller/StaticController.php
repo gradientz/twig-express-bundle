@@ -35,7 +35,7 @@ class StaticController extends Controller
      */
     public function rootAction()
     {
-        return $this->render('@KaliopTwigExpress/root.html.twig', [
+        return $this->render('@KaliopTwigExpress/rootindex.html.twig', [
             'bundles' => $this->container->getParameter('twig_express.bundles')
         ]);
     }
@@ -155,7 +155,7 @@ class StaticController extends Controller
             ];
         }
 
-        return $this->render('@KaliopTwigExpress/layout.html.twig', [
+        return $this->render('@KaliopTwigExpress/dirindex.html.twig', [
             'breadcrumbs' => $breadcrumbs,
             'dirList' => $dirList,
             'fileList' => $fileList,
